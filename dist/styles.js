@@ -317,7 +317,7 @@ export function cssData(user) {
       transparent 80%
     );
   }
-  /* Glow on center temperature digits in dark mode non-off states.
+  /* Glow on center temperature digits in non-off states.
      SVG <text> ignores text-shadow, so we use filter: drop-shadow which
      traces each glyph's silhouette (the "0,0 offset blurred outline"
      effect the request describes). Static (not animated) so the
@@ -325,29 +325,47 @@ export function cssData(user) {
      minimum. Active states use a brighter/wider glow than idle states.
      Applied to all center temperature labels: --ambient (displayed
      normally), --target (displayed during in_control), and --low/--high
-     (displayed during in_control with dual setpoints). */
+     (displayed during in_control with dual setpoints). Same values for
+     both variants; if a variant needs asymmetric tuning later, split the
+     selectors and adjust. */
   .dial--dark.is-active-cool .dial__lbl--ambient,
   .dial--dark.is-active-cool .dial__lbl--target,
   .dial--dark.is-active-cool .dial__lbl--low,
-  .dial--dark.is-active-cool .dial__lbl--high {
+  .dial--dark.is-active-cool .dial__lbl--high,
+  .dial--light.is-active-cool .dial__lbl--ambient,
+  .dial--light.is-active-cool .dial__lbl--target,
+  .dial--light.is-active-cool .dial__lbl--low,
+  .dial--light.is-active-cool .dial__lbl--high {
     filter: drop-shadow(0 0 10px rgba(0, 122, 241, 0.85));
   }
   .dial--dark.is-idle-cool .dial__lbl--ambient,
   .dial--dark.is-idle-cool .dial__lbl--target,
   .dial--dark.is-idle-cool .dial__lbl--low,
-  .dial--dark.is-idle-cool .dial__lbl--high {
+  .dial--dark.is-idle-cool .dial__lbl--high,
+  .dial--light.is-idle-cool .dial__lbl--ambient,
+  .dial--light.is-idle-cool .dial__lbl--target,
+  .dial--light.is-idle-cool .dial__lbl--low,
+  .dial--light.is-idle-cool .dial__lbl--high {
     filter: drop-shadow(0 0 6px rgba(0, 122, 241, 0.55));
   }
   .dial--dark.is-active-heat .dial__lbl--ambient,
   .dial--dark.is-active-heat .dial__lbl--target,
   .dial--dark.is-active-heat .dial__lbl--low,
-  .dial--dark.is-active-heat .dial__lbl--high {
+  .dial--dark.is-active-heat .dial__lbl--high,
+  .dial--light.is-active-heat .dial__lbl--ambient,
+  .dial--light.is-active-heat .dial__lbl--target,
+  .dial--light.is-active-heat .dial__lbl--low,
+  .dial--light.is-active-heat .dial__lbl--high {
     filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.85));
   }
   .dial--dark.is-idle-heat .dial__lbl--ambient,
   .dial--dark.is-idle-heat .dial__lbl--target,
   .dial--dark.is-idle-heat .dial__lbl--low,
-  .dial--dark.is-idle-heat .dial__lbl--high {
+  .dial--dark.is-idle-heat .dial__lbl--high,
+  .dial--light.is-idle-heat .dial__lbl--ambient,
+  .dial--light.is-idle-heat .dial__lbl--target,
+  .dial--light.is-idle-heat .dial__lbl--low,
+  .dial--light.is-idle-heat .dial__lbl--high {
     filter: drop-shadow(0 0 6px rgba(255, 140, 0, 0.55));
   }
   /* HVAC accent colors tuned for contrast on light backgrounds. Each

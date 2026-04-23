@@ -54,18 +54,28 @@ All edits below are inside the `var css = \`...\`` template literal. Insert the 
 
 In-flight addition responding to QA feedback that the dark-variant cool overlay remained too subtle at the breath's minimum. Adds a colored `filter: drop-shadow` on the center temperature digits that tracks the same `is-active-*` / `is-idle-*` state classes but is static (not animated).
 
+Initially shipped (v0.1.10) dark-variant-only. After dark-mode QA confirmed the reinforcement effect reads "MUCH clearer", the light variant gained the same treatment in v0.1.11 for theme parity.
+
 - [x] 7.1 Add `.dial--dark.is-active-cool` glow rule: 10px blur, rgba(0,122,241,0.85) on `.dial__lbl--ambient`, `--target`, `--low`, `--high`
 - [x] 7.2 Add `.dial--dark.is-idle-cool` glow rule: 6px blur, rgba(0,122,241,0.55) on same selectors
 - [x] 7.3 Add `.dial--dark.is-active-heat` glow rule: 10px blur, rgba(255,140,0,0.85) on same selectors
 - [x] 7.4 Add `.dial--dark.is-idle-heat` glow rule: 6px blur, rgba(255,140,0,0.55) on same selectors
-- [x] 7.5 Confirm no glow is applied in the light variant (no `.dial--light` glow rule added)
+- [x] 7.5 ~~Confirm no glow is applied in the light variant~~ (superseded by 7.16–7.19 below; parity is now the design)
 - [x] 7.6 Bump `dist/main.js` banner + cache-busters from `0.1.9` to `0.1.10`
 - [x] 7.7 Update `README.md` with a `v0.1.10` changelog entry
 - [x] 7.8 Run `openspec validate dark-theme-activity-overlay --strict` — valid
-- [ ] 7.9 Manual QA: dark dashboard, active cooling — confirm cool-blue glow around the big digits is clearly visible and reads as "active + cool" at a glance
+- [x] 7.9 Manual QA: dark dashboard, active cooling — confirm cool-blue glow around the big digits is clearly visible and reads as "active + cool" at a glance (ACK v0.1.10)
 - [ ] 7.10 Manual QA: dark dashboard, idle cool (mode=cool, action=idle) — confirm a softer cool-blue glow is present but clearly subtler than the active-cool glow
 - [ ] 7.11 Manual QA: dark dashboard, active heating — confirm warm-orange glow around the big digits
 - [ ] 7.12 Manual QA: dark dashboard, idle heat (mode=heat, action=idle) — confirm softer warm-orange glow
 - [ ] 7.13 Manual QA: dark dashboard, thermostat off — confirm NO glow (digits render with no filter)
-- [ ] 7.14 Manual QA: light dashboard, any active state — confirm light-variant digits still render without glow
+- [ ] 7.14 ~~Manual QA: light dashboard, any active state — confirm light-variant digits still render without glow~~ (inverted — see 7.20)
 - [ ] 7.15 Manual QA: during the overlay pulse, confirm the glow does NOT pulse along (stays constant while the background overlay breathes)
+- [x] 7.16 Extend `.dial--light.is-active-cool` into the existing active-cool glow rule (same 10px / rgba(0,122,241,0.85))
+- [x] 7.17 Extend `.dial--light.is-idle-cool` into the idle-cool glow rule (same 6px / rgba(0,122,241,0.55))
+- [x] 7.18 Extend `.dial--light.is-active-heat` and `.dial--light.is-idle-heat` into the heat glow rules
+- [x] 7.19 Bump `dist/main.js` banner + cache-busters from `0.1.10` to `0.1.11`; update `README.md` changelog
+- [ ] 7.20 Manual QA (post-sunrise): light dashboard, active cooling — confirm cool-blue glow around the big dark digits reads as a halo and reinforces active-cool state without looking muddy
+- [ ] 7.21 Manual QA (post-sunrise): light dashboard, idle cool / active heat / idle heat — confirm parity with dark variant's behavior
+- [ ] 7.22 Manual QA (post-sunrise): light dashboard, thermostat off — confirm NO glow
+- [ ] 7.23 Tune-if-needed: if light-variant glow reads as muddy / overbearing / insufficient, split the combined selectors in `dist/styles.js` and adjust light values independently

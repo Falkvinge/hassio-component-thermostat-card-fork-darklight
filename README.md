@@ -65,6 +65,16 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.11 — 2026-04-23
+
+Extend the v0.1.10 digit glow into the light variant for theme parity. After v0.1.10 QA confirmed the dark-mode glow reads clearly at a glance, light mode gets the same treatment — ready to verify at the next sunrise when the dashboard flips to Google Light Theme.
+
+- **Added:** The same `filter: drop-shadow` glow now applies in the light variant:
+  - `.dial--light.is-active-cool` / `is-idle-cool` — cool-blue glow
+  - `.dial--light.is-active-heat` / `is-idle-heat` — warm-orange glow
+  - Same blur / alpha values as the dark variant (10px / 0.85 active, 6px / 0.55 idle). On light backgrounds the glow reads as a colored halo around each dark glyph rather than a full silhouette bleed.
+- **Revised:** My v0.1.10 claim that a colored glow in light mode would look "muddy" was defensive and untested. The selectors are now unified; if light-mode tuning turns out to need different values, the combined selector groups can be split cleanly.
+
 ### v0.1.10 — 2026-04-23
 
 Dark-mode digit glow. Addresses QA feedback that the dark-variant cooling overlay stayed a little too subtle even with v0.1.6's intensity tuning, especially at the breath's local minimum.
