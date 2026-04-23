@@ -42,11 +42,11 @@ The card SHALL accept a configuration object via `setConfig()` and apply default
 
 ### Requirement: Entity state tracking with diff-based updates
 
-The card SHALL extract state from the HA entity on every `hass` setter call and only push updates to the UI when relevant state has changed.
+The card SHALL extract state from the HA entity and theme data on every `hass` setter call and only push updates to the UI when relevant state has changed.
 
 #### Scenario: State extraction from entity
 - **WHEN** the `hass` setter is called with a valid entity
-- **THEN** the card extracts: `min_value`, `max_value`, `ambient_temperature`, `target_temperature`, `target_temperature_low`, `target_temperature_high`, `hvac_state`, `hvac_modes`, `preset_mode`, and `away` from the entity's state and attributes
+- **THEN** the card extracts: `min_value`, `max_value`, `ambient_temperature`, `target_temperature`, `target_temperature_low`, `target_temperature_high`, `hvac_state`, `hvac_modes`, `preset_mode`, `away`, and the resolved `theme_dark` boolean from the entity's state/attributes and `hass.themes`
 
 #### Scenario: Ambient temperature override
 - **WHEN** `config.ambient_temperature` is set to a valid sensor entity ID
@@ -57,8 +57,12 @@ The card SHALL extract state from the HA entity on every `hass` setter call and 
 - **THEN** those values override the entity's `min_temp` / `max_temp` attributes
 
 #### Scenario: No update on unchanged state
-- **WHEN** the `hass` setter is called but all tracked state fields match the previously saved state
+- **WHEN** the `hass` setter is called but all tracked state fields — including `theme_dark` — match the previously saved state
 - **THEN** `updateState` is NOT called on the ThermostatUI instance
+
+#### Scenario: Update on theme change only
+- **WHEN** the `hass` setter is called and only `theme_dark` has changed (all other fields match)
+- **THEN** `updateState` IS called on the ThermostatUI instance with the new state
 
 #### Scenario: Missing entity
 - **WHEN** the `hass` setter is called and `hass.states[config.entity]` is undefined
@@ -103,3 +107,41 @@ The card SHALL be installable via HACS (Home Assistant Community Store).
 #### Scenario: HACS metadata
 - **WHEN** HACS scans the repository
 - **THEN** it finds `hacs.json` with `name: "Climate thermostat card"`, `render_readme: true`, and `filename: "main.js"`
+
+### Requirement: HVAC action tracking and active_mode derivation
+
+The card SHALL extract the climate entity's `hvac_action` attribute (if present) on every `hass` update, derive an `active_mode` value of `'active_heat'`, `'active_cool'`, `'idle_heat'`, `'idle_cool'`, or `null`, and include `hvac_action` in the state-diff comparison so that a transition in/out of active pumping triggers a re-render.
+
+The derivation distinguishes **active** (the compressor is confirmed pumping) from **idle** (the mode is armed but no active-pumping signal). Because climate integrations are known to under-report active pumping (some never expose `hvac_action`; others report `idle` while the unit is audibly running), the idle signal is still a useful "this AC is switched on" indicator for dashboard-scanning.
+
+#### Scenario: hvac_action = heating
+- **WHEN** `entity.attributes.hvac_action === 'heating'`
+- **THEN** `active_mode` resolves to `'active_heat'`
+
+#### Scenario: hvac_action = cooling
+- **WHEN** `entity.attributes.hvac_action === 'cooling'`
+- **THEN** `active_mode` resolves to `'active_cool'`
+
+#### Scenario: hvac_action = idle (or any non-active value), state = heat
+- **WHEN** `entity.attributes.hvac_action` is present and not `'heating'`/`'cooling'` AND `entity.state === 'heat'`
+- **THEN** `active_mode` resolves to `'idle_heat'`
+
+#### Scenario: hvac_action = idle (or any non-active value), state = cool
+- **WHEN** `entity.attributes.hvac_action` is present and not `'heating'`/`'cooling'` AND `entity.state === 'cool'`
+- **THEN** `active_mode` resolves to `'idle_cool'`
+
+#### Scenario: hvac_action unavailable, state = heat
+- **WHEN** `entity.attributes.hvac_action` is undefined AND `entity.state === 'heat'`
+- **THEN** `active_mode` resolves to `'idle_heat'` (conservative: we know the mode, we don't know whether it's actively pumping)
+
+#### Scenario: hvac_action unavailable, state = cool
+- **WHEN** `entity.attributes.hvac_action` is undefined AND `entity.state === 'cool'`
+- **THEN** `active_mode` resolves to `'idle_cool'`
+
+#### Scenario: state = off, auto, heat_cool, dry, fan_only, or unknown
+- **WHEN** `entity.state` is `'off'`, `'auto'`, `'heat_cool'`, `'dry'`, `'fan_only'`, or anything outside `'heat'`/`'cool'` (regardless of `hvac_action`)
+- **THEN** `active_mode` resolves to `null`
+
+#### Scenario: State diff reacts to hvac_action change
+- **WHEN** `hvac_action` transitions between values (e.g. `idle` → `heating`) AND no other diffed state field changes
+- **THEN** the card still calls `updateState` so the overlay can transition from idle-tint to active-pulse (or vice versa)
