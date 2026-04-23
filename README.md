@@ -65,6 +65,14 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.7 — 2026-04-23
+
+Fixed dark/light theme auto-detection not following HA's runtime theme switch.
+
+- **Fixed:** `resolveThemeDark` was comparing `hass.themes.selectedTheme` to the strings `"Google Dark Theme"` / `"Google Light Theme"`, but `selectedTheme` is a **ThemeSettings object** (`{ theme, dark?, ... }`), not a string — so those comparisons always evaluated to `false` and the name-based overrides never fired.
+- **Fixed (design):** Even if the string comparison had worked, a theme named "Google Dark Theme" can be used in both light and dark mode (HA's `darkMode` toggle controls the variant), so overriding based on name alone was architecturally wrong.
+- **Changed:** Detection now reads `selectedTheme.dark` first (HA's per-theme dark preference, the most specific signal), then falls back to `hass.themes.darkMode` (the global toggle). Named-theme string overrides removed entirely.
+
 ### v0.1.6 — 2026-04-23
 
 Raised activity overlay visibility for both themes — the pulse is now clearly distinguishable from "no activity" even when glanced at mid-cycle at its local minimum.

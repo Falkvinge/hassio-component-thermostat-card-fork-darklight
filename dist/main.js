@@ -1,6 +1,6 @@
-import {cssData} from './styles.js?v=0.1.6';
-import ThermostatUI from './thermostat_card.lib.js?v=0.1.6';
-console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.6 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
+import {cssData} from './styles.js?v=0.1.7';
+import ThermostatUI from './thermostat_card.lib.js?v=0.1.7';
+console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.7 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 
 // Register with Home Assistant's card picker so this fork is identifiable
 // at card-configuration time. Without this, the "Add card" dialog would
@@ -190,14 +190,16 @@ function deriveActiveMode(entity) {
 }
 
 // Resolve HA theme mode to a boolean: true = dark, false = light.
-// "Google Dark Theme" and "Google Light Theme" override the darkMode
-// flag so an explicit theme choice beats the auto toggle. Missing
-// theme data defaults to dark (backward-compatible with pre-theme builds).
+// hass.themes.selectedTheme is a ThemeSettings object { theme, dark?, ... },
+// not a string. Its .dark field, when present, is the most specific signal
+// (reflects the per-theme dark/light preference HA applies at runtime).
+// hass.themes.darkMode is the global toggle and the fallback.
+// Missing theme data defaults to dark (backward-compatible).
 function resolveThemeDark(hass) {
-  const theme = hass && hass.themes && hass.themes.selectedTheme;
-  if (theme === 'Google Dark Theme') return true;
-  if (theme === 'Google Light Theme') return false;
-  const darkMode = hass && hass.themes && hass.themes.darkMode;
+  if (!hass || !hass.themes) return true;
+  const sel = hass.themes.selectedTheme;
+  if (sel && typeof sel.dark === 'boolean') return sel.dark;
+  const darkMode = hass.themes.darkMode;
   return darkMode === undefined ? true : !!darkMode;
 }
 
