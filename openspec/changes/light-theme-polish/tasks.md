@@ -57,7 +57,7 @@ Implementation revealed that tying the overlay strictly to `hvac_action: heating
 - [x] 8.7 Sanity: `node --check` passes on the three `dist/*.js` files; CSS brace balance holds.
 - [x] 8.8 Bump version strings in `dist/main.js` from `0.1.2` to `0.1.3`.
 - [x] 8.9 Add a v0.1.3 changelog entry to `README.md`.
-- [x] 8.10 Commit on a fresh `agent/light-theme-polish-diff` worktree, merge `--no-ff` into master, tag `v0.1.3`, push master + tag, create the GitHub release with the three `dist/*.js` assets.
+- [x] 8.10 Commit on a fresh `agent/light-theme-polish-diff` worktree, merge `--no-ff` into master, tag `v0.1.3`, push master + tag, create the GitHub release with the three `dist/*.js` assets. *(Release: https://github.com/Falkvinge/hassio-component-thermostat-card-fork-darklight/releases/tag/v0.1.3)*
 
 ### 8.11 Manual verification on live HA (retest + extend)
 
