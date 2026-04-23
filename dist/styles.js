@@ -176,11 +176,60 @@ export function cssData(user) {
      dialog — which are siblings inside the container, not descendants
      of the SVG. */
   .dial--light .dial {
-    --thermostat-off-fill: #e8e8e8;
+    /* Near-white off-fill so an idle thermostat fades into a light
+       dashboard instead of reading as a dark-grey disc. Discernible
+       from pure #ffffff but only just. */
+    --thermostat-off-fill: #f7f7f7;
     --thermostat-path-color: rgba(0, 0, 0, 0.15);
     --thermostat-path-active-color: rgba(0, 0, 0, 0.6);
     --thermostat-path-active-color-large: rgba(0, 0, 0, 0.85);
     --thermostat-text-color: #333333;
+  }
+
+  /* Active-state pulse overlay, light variant only. A soft radial
+     gradient centered on the container, breathing slowly so users
+     scanning a dashboard can spot which climate entities are
+     actually heating/cooling right now. Detection signal comes
+     from active_mode (hvac_action primary, hvac_state fallback)
+     which main.js derives per update. */
+  .dial--light {
+    position: relative;
+  }
+  .dial--light.is-active-heat::before,
+  .dial--light.is-active-cool::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    animation: darklight-pulse 3s ease-in-out infinite;
+  }
+  .dial--light.is-active-heat::before {
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 140, 0, 0.22) 0%,
+      rgba(255, 140, 0, 0.08) 45%,
+      transparent 80%
+    );
+  }
+  .dial--light.is-active-cool::before {
+    background: radial-gradient(
+      circle at center,
+      rgba(0, 122, 241, 0.22) 0%,
+      rgba(0, 122, 241, 0.08) 45%,
+      transparent 80%
+    );
+  }
+  @keyframes darklight-pulse {
+    0%, 100% { opacity: 0.40; }
+    50%      { opacity: 0.90; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dial--light.is-active-heat::before,
+    .dial--light.is-active-cool::before {
+      animation: none;
+      opacity: 0.65;
+    }
   }
   /* HVAC accent colors tuned for contrast on light backgrounds. Each
      mode keeps its identity from the dark variant; saturation and

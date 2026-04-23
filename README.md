@@ -65,6 +65,12 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.2 — 2026-04-23
+
+- **Changed (light theme):** The off-state dial fill is now near-white (`#f7f7f7`) instead of the previous mid-grey, so an idle thermostat blends into a light dashboard instead of reading as a dark disc.
+- **New (light theme):** When a climate entity is actively heating or cooling (via `hvac_action`, with `hvac_state` as a fallback for entities that don't expose the attribute), the card displays a soft radial-gradient glow that pulses slowly — warm orange for heating, cool blue for cooling. The effect is peripheral-vision friendly by design: noticeable on an overview dashboard, not attention-stealing. Respects the OS `prefers-reduced-motion` setting (glow stays, pulse stops). Dark variant is unchanged.
+- **Unchanged:** Public API, dashboard YAML, all existing behavior from v0.1.1.
+
 ### v0.1.1 — 2026-04-23
 
 - **New:** Card self-registers with Home Assistant's `window.customCards` registry. The HA "Add card" dialog now lists this card as "Thermostat Card (darklight fork)" with a description and a direct link to this repo. Fork identity is now visible at dashboard-configuration time, not just in the devtools console.

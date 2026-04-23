@@ -1,6 +1,6 @@
-import {cssData} from './styles.js?v=0.1.1';
-import ThermostatUI from './thermostat_card.lib.js?v=0.1.1';
-console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.1 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
+import {cssData} from './styles.js?v=0.1.2';
+import ThermostatUI from './thermostat_card.lib.js?v=0.1.2';
+console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.2 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 
 // Register with Home Assistant's card picker so this fork is identifiable
 // at card-configuration time. Without this, the "Add card" dialog would
@@ -46,7 +46,9 @@ class ThermostatCard extends HTMLElement {
       hvac_modes:entity.attributes.hvac_modes,
       preset_mode: entity.attributes.preset_mode,
       away: (entity.attributes.away_mode == 'on' ? true : false),
-      theme_dark: resolveThemeDark(hass)
+      theme_dark: resolveThemeDark(hass),
+      hvac_action: entity.attributes.hvac_action,
+      active_mode: deriveActiveMode(entity)
     }
 
     if (!this._saved_state ||
@@ -59,7 +61,8 @@ class ThermostatCard extends HTMLElement {
         this._saved_state.hvac_state != new_state.hvac_state ||
         this._saved_state.preset_mode != new_state.preset_mode ||
         this._saved_state.away != new_state.away ||
-        this._saved_state.theme_dark != new_state.theme_dark)) {
+        this._saved_state.theme_dark != new_state.theme_dark ||
+        this._saved_state.hvac_action != new_state.hvac_action)) {
       this._saved_state = new_state;
       this.thermostat.updateState(new_state,hass);
      }
@@ -161,6 +164,25 @@ class ThermostatCard extends HTMLElement {
   }
 }
 customElements.define('thermostat-card', ThermostatCard);
+
+// Derive a simple active-mode signal from the climate entity:
+// 'heat' | 'cool' | null. Prefer the hvac_action attribute (answers
+// "is this climate actively pumping right now?"); fall back to the
+// selected mode (hvac_state) when the entity doesn't report action.
+// In auto/heat_cool without an action signal the direction is
+// ambiguous, so return null rather than guess.
+function deriveActiveMode(entity) {
+  const action = entity && entity.attributes && entity.attributes.hvac_action;
+  if (action === 'heating') return 'heat';
+  if (action === 'cooling') return 'cool';
+  if (action === 'idle' || action === 'off' || action === 'fan' || action === 'drying') return null;
+  // Fallback: entity doesn't expose hvac_action. Use the selected mode
+  // as a best-effort signal for heat/cool; everything else is null.
+  const state = entity && entity.state;
+  if (state === 'heat') return 'heat';
+  if (state === 'cool') return 'cool';
+  return null;
+}
 
 // Resolve HA theme mode to a boolean: true = dark, false = light.
 // "Google Dark Theme" and "Google Light Theme" override the darkMode
