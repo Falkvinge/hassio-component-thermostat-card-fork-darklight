@@ -167,7 +167,57 @@ export function cssData(user) {
     --thermostat-path-active-color-large: rgba(255, 255, 255, 1);
     --thermostat-text-color: white;
   }
-  
+
+  /* Light variant. The dial--light class lives on the card container
+     (set in ThermostatUI.updateState based on hass.themes.darkMode +
+     Google theme name override from main.js::resolveThemeDark). All
+     light-variant rules are scoped by .dial--light as a descendant
+     selector so they reach the SVG, the mode-icon dot, and the
+     dialog — which are siblings inside the container, not descendants
+     of the SVG. */
+  .dial--light .dial {
+    --thermostat-off-fill: #e8e8e8;
+    --thermostat-path-color: rgba(0, 0, 0, 0.15);
+    --thermostat-path-active-color: rgba(0, 0, 0, 0.6);
+    --thermostat-path-active-color-large: rgba(0, 0, 0, 0.85);
+    --thermostat-text-color: #333333;
+  }
+  /* HVAC accent colors tuned for contrast on light backgrounds. Each
+     mode keeps its identity from the dark variant; saturation and
+     lightness are adjusted so ticks and mode icons stay legible. */
+  .dial--light {
+    --heat_color: #e06600;
+    --heat_colorc: #c05400;
+    --cool_color: rgba(0, 100, 200, 0.7);
+    --cool_colorc: rgba(0, 90, 190, 1);
+    --auto_color: #c65400;
+    --off_color: #999999;
+    --fan_only_color: #8a8a8a;
+    --dry_color: #c99400;
+    --idle_color: #9e9e9e;
+    --manual_color: #355875;
+    --unknown_color: #8a8a9a;
+  }
+  .dial--light .dial__editableIndicator {
+    fill: #333333;
+  }
+  .dial--light .dial__chevron {
+    stroke: var(--thermostat-text-color);
+  }
+  .dial--light .dot_r {
+    background-color: #333333;
+  }
+  .dial--light .dialog {
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid #cccccc;
+    box-shadow: 0px 0px 10px 0px #bdbdbd;
+    backdrop-filter: blur(6px) grayscale(20%);
+  }
+  .dial--light .dialog.pending {
+    border: 1px solid var(--mode_color);
+    box-shadow: 0px 0px 10px 0px var(--mode_color);
+  }
+
   .dial.has-thermo .dial__ico__leaf {
     visibility: hidden;
   }

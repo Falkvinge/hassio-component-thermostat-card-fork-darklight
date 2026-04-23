@@ -32,7 +32,8 @@ class ThermostatCard extends HTMLElement {
       hvac_state: entity.state,
       hvac_modes:entity.attributes.hvac_modes,
       preset_mode: entity.attributes.preset_mode,
-      away: (entity.attributes.away_mode == 'on' ? true : false)
+      away: (entity.attributes.away_mode == 'on' ? true : false),
+      theme_dark: resolveThemeDark(hass)
     }
 
     if (!this._saved_state ||
@@ -44,7 +45,8 @@ class ThermostatCard extends HTMLElement {
         this._saved_state.target_temperature_high != new_state.target_temperature_high ||
         this._saved_state.hvac_state != new_state.hvac_state ||
         this._saved_state.preset_mode != new_state.preset_mode ||
-        this._saved_state.away != new_state.away)) {
+        this._saved_state.away != new_state.away ||
+        this._saved_state.theme_dark != new_state.theme_dark)) {
       this._saved_state = new_state;
       this.thermostat.updateState(new_state,hass);
      }
@@ -146,6 +148,18 @@ class ThermostatCard extends HTMLElement {
   }
 }
 customElements.define('thermostat-card', ThermostatCard);
+
+// Resolve HA theme mode to a boolean: true = dark, false = light.
+// "Google Dark Theme" and "Google Light Theme" override the darkMode
+// flag so an explicit theme choice beats the auto toggle. Missing
+// theme data defaults to dark (backward-compatible with pre-theme builds).
+function resolveThemeDark(hass) {
+  const theme = hass && hass.themes && hass.themes.selectedTheme;
+  if (theme === 'Google Dark Theme') return true;
+  if (theme === 'Google Light Theme') return false;
+  const darkMode = hass && hass.themes && hass.themes.darkMode;
+  return darkMode === undefined ? true : !!darkMode;
+}
 
 function deepClone(value) {
   if (!(!!value && typeof value == 'object')) {

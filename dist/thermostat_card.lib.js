@@ -92,6 +92,8 @@ export default class ThermostatUI {
     this.hvac_state = options.hvac_state;
     this.preset_mode = options.preset_mode;
     this.hvac_modes = options.hvac_modes;
+    // options.theme_dark may be undefined on very first render; default to dark.
+    this.theme_dark = options.theme_dark === undefined ? true : !!options.theme_dark;
     this.temperature = {
       low: options.target_temperature_low,
       high: options.target_temperature_high,
@@ -100,6 +102,11 @@ export default class ThermostatUI {
     }
 
     this._updateClass('has_dual', this.dual);
+    // Theme variant class lives on the container, not the SVG root, so that
+    // the SVG dial, the mode-icon dot, and the mode dialog (all siblings
+    // inside the container) can respond via descendant selectors in CSS.
+    this._container.classList.toggle('dial--dark', this.theme_dark);
+    this._container.classList.toggle('dial--light', !this.theme_dark);
     let tick_label, from, to;
     const tick_indexes = [];
     const ambient_index = SvgUtil.restrictToRange(Math.round((this.ambient - this.min_value) / (this.max_value - this.min_value) * config.num_ticks), 0, config.num_ticks - 1);
