@@ -30,7 +30,7 @@
 
 - [x] 6.1 Bump version strings in `dist/main.js` (import cache-busters + console banner) from `0.1.1` to `0.1.2`.
 - [x] 6.2 Add a v0.1.2 changelog entry to `README.md`.
-- [ ] 6.3 Commit on `agent/light-theme-polish` worktree branch, merge `--no-ff` into master, tag `v0.1.2`, push master + tag, create the GitHub release with the three `dist/*.js` files as assets (same flow as v0.1.1).
+- [x] 6.3 Commit on `agent/light-theme-polish` worktree branch, merge `--no-ff` into master, tag `v0.1.2`, push master + tag, create the GitHub release with the three `dist/*.js` files as assets (same flow as v0.1.1).
 
 ## 7. Verification (manual, live HA)
 
