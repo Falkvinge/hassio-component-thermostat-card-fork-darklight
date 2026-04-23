@@ -65,6 +65,17 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.10 — 2026-04-23
+
+Dark-mode digit glow. Addresses QA feedback that the dark-variant cooling overlay stayed a little too subtle even with v0.1.6's intensity tuning, especially at the breath's local minimum.
+
+- **Added:** Colored blurred glow around the center temperature digits in dark mode whenever the entity is in a non-off `heat` / `cool` state (active or idle). Implemented with `filter: drop-shadow(0 0 Npx rgba(...))` on the SVG `<text>` elements.
+  - Active cooling / heating: 10px blur, rgba alpha ~0.85 — bright, clear reinforcement of "actively pumping".
+  - Idle cooling / heating: 6px blur, rgba alpha ~0.55 — softer reinforcement of "armed but not pumping".
+  - Colors match the existing overlay palette: cool-blue `rgba(0, 122, 241, ...)`, warm-orange `rgba(255, 140, 0, ...)`.
+- **Static glow, pulsing overlay:** The glow does not animate. The background overlay still breathes for the active states, but the glow provides always-on reinforcement that remains visible at the overlay pulse's minimum — which is the original complaint from v0.1.6.
+- **Light variant unchanged:** No glow is applied under `.dial--light`. A semi-transparent colored glow around dark text on a near-white background would read as muddy rather than reinforcing, so the effect is intentionally dark-variant-only.
+
 ### v0.1.9 — 2026-04-23
 
 Resolve the effective theme name across all three HA sources, so named-theme overrides work when HA switches the **default theme** at sunset/sunrise (the common deployment pattern).

@@ -317,6 +317,39 @@ export function cssData(user) {
       transparent 80%
     );
   }
+  /* Glow on center temperature digits in dark mode non-off states.
+     SVG <text> ignores text-shadow, so we use filter: drop-shadow which
+     traces each glyph's silhouette (the "0,0 offset blurred outline"
+     effect the request describes). Static (not animated) so the
+     reinforcement is always visible, including at the breath's local
+     minimum. Active states use a brighter/wider glow than idle states.
+     Applied to all center temperature labels: --ambient (displayed
+     normally), --target (displayed during in_control), and --low/--high
+     (displayed during in_control with dual setpoints). */
+  .dial--dark.is-active-cool .dial__lbl--ambient,
+  .dial--dark.is-active-cool .dial__lbl--target,
+  .dial--dark.is-active-cool .dial__lbl--low,
+  .dial--dark.is-active-cool .dial__lbl--high {
+    filter: drop-shadow(0 0 10px rgba(0, 122, 241, 0.85));
+  }
+  .dial--dark.is-idle-cool .dial__lbl--ambient,
+  .dial--dark.is-idle-cool .dial__lbl--target,
+  .dial--dark.is-idle-cool .dial__lbl--low,
+  .dial--dark.is-idle-cool .dial__lbl--high {
+    filter: drop-shadow(0 0 6px rgba(0, 122, 241, 0.55));
+  }
+  .dial--dark.is-active-heat .dial__lbl--ambient,
+  .dial--dark.is-active-heat .dial__lbl--target,
+  .dial--dark.is-active-heat .dial__lbl--low,
+  .dial--dark.is-active-heat .dial__lbl--high {
+    filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.85));
+  }
+  .dial--dark.is-idle-heat .dial__lbl--ambient,
+  .dial--dark.is-idle-heat .dial__lbl--target,
+  .dial--dark.is-idle-heat .dial__lbl--low,
+  .dial--dark.is-idle-heat .dial__lbl--high {
+    filter: drop-shadow(0 0 6px rgba(255, 140, 0, 0.55));
+  }
   /* HVAC accent colors tuned for contrast on light backgrounds. Each
      mode keeps its identity from the dark variant; saturation and
      lightness are adjusted so ticks and mode icons stay legible. */

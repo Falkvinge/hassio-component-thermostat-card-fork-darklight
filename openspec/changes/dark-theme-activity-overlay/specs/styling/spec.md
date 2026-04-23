@@ -1,3 +1,48 @@
+## ADDED Requirements
+
+### Requirement: Digit glow reinforcement (dark variant)
+
+When the dark variant is active AND the climate entity is in any non-off `heat` / `cool` state (active or idle), the center temperature labels SHALL render a colored blurred glow matching the activity-overlay color (warm-orange for heat, cool-blue for cool). The glow provides an always-on visual reinforcement that remains visible at the overlay pulse's minimum opacity — addressing the observation that the dark-variant overlay alone can read as too subtle at its local minimum, especially for the cool state which competes with the dark background more than the warm state does.
+
+The glow is implemented via `filter: drop-shadow(0 0 Npx rgba(...))` on the SVG `<text>` elements (SVG text ignores `text-shadow`). It applies to all center temperature labels: `.dial__lbl--ambient` (shown normally), `.dial__lbl--target` (shown during `in_control`), and `.dial__lbl--low` / `.dial__lbl--high` (shown during `in_control` with dual setpoints).
+
+The glow has two intensities keyed by the same `is-active-*` / `is-idle-*` classes as the overlay:
+
+- **Active glow**: wider and brighter (approximately 10px blur, alpha ~0.85). Matches the pulsing overlay's "actively pumping" meaning.
+- **Idle glow**: narrower and dimmer (approximately 6px blur, alpha ~0.55). Matches the static-tint overlay's "armed but not pumping" meaning.
+
+The glow is **static** (no animation) regardless of state. It does not follow the overlay's pulse. This is deliberate: the overlay provides the breathing motion that signals "active pumping", while the glow provides always-visible color reinforcement that doesn't fade during the pulse's minimum. The two effects layer rather than compete.
+
+The glow is NOT applied in the light variant, because light-variant center digits are dark-colored on a near-white background and a semi-transparent colored glow around dark text reads as muddy rather than reinforcing.
+
+#### Scenario: Cool glow on active cooling in dark variant
+- **WHEN** the container has classes `dial--dark` and `is-active-cool`
+- **THEN** the center temperature labels render with a cool-blue `drop-shadow` filter at approximately 10px blur and alpha ~0.85
+
+#### Scenario: Cool glow on idle cooling in dark variant
+- **WHEN** the container has classes `dial--dark` and `is-idle-cool`
+- **THEN** the center temperature labels render with a cool-blue `drop-shadow` filter at approximately 6px blur and alpha ~0.55
+
+#### Scenario: Warm glow on active heating in dark variant
+- **WHEN** the container has classes `dial--dark` and `is-active-heat`
+- **THEN** the center temperature labels render with a warm-orange `drop-shadow` filter at approximately 10px blur and alpha ~0.85
+
+#### Scenario: Warm glow on idle heating in dark variant
+- **WHEN** the container has classes `dial--dark` and `is-idle-heat`
+- **THEN** the center temperature labels render with a warm-orange `drop-shadow` filter at approximately 6px blur and alpha ~0.55
+
+#### Scenario: No glow in off/auto/etc states
+- **WHEN** the container has class `dial--dark` but none of the four `is-active-*` / `is-idle-*` classes
+- **THEN** the center temperature labels render without any `drop-shadow` filter (backward-compatible)
+
+#### Scenario: No glow in light variant
+- **WHEN** the container has class `dial--light` (regardless of the overlay classes)
+- **THEN** the center temperature labels render without any `drop-shadow` filter
+
+#### Scenario: Glow is static during pulse
+- **WHEN** the overlay is actively pulsing (`is-active-cool` or `is-active-heat` in dark variant) AND the overlay is at any point in its opacity cycle
+- **THEN** the digit glow's blur radius and alpha remain constant (the glow does not animate)
+
 ## MODIFIED Requirements
 
 ### Requirement: Differentiated activity overlay, both theme variants

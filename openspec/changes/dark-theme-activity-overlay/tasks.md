@@ -39,13 +39,33 @@ All edits below are inside the `var css = \`...\`` template literal. Insert the 
 
 ## 6. Manual QA (post-release, live HA instance)
 
-- [ ] 6.1 Dark dashboard, thermostat `cool`, `hvac_action: cooling` — confirm a cool-blue pulse/glow animates on the card
+- [x] 6.1 Dark dashboard, thermostat `cool`, `hvac_action: cooling` — confirm a cool-blue pulse/glow animates on the card
 - [ ] 6.2 Dark dashboard, thermostat `cool`, `hvac_action: idle` — confirm a soft static cool-blue tint (no pulsing)
 - [ ] 6.3 Dark dashboard, thermostat `heat`, `hvac_action: heating` — confirm warm-orange pulse
 - [ ] 6.4 Dark dashboard, thermostat `heat`, `hvac_action: idle` — confirm soft static warm-orange tint
-- [ ] 6.5 Dark dashboard, thermostat `off` — confirm NO overlay
+- [x] 6.5 Dark dashboard, thermostat `off` — confirm NO overlay
 - [ ] 6.6 Perceptual comparison: dark-cooling pulse vs light-cooling pulse side by side — both should read as "similarly subtle" despite the different background. Neither should feel garish; neither invisible. Tune alphas in a follow-up if off.
 - [ ] 6.7 Light dashboard with any active state — confirm light overlay is unchanged (not accidentally broken)
 - [ ] 6.8 Dark dashboard, 2×2 grid of cards: idle-tint cards clearly distinguishable from fully-off cards at a glance; active-pulse cards clearly distinguishable from idle-tint at a glance
 - [ ] 6.9 OS "Reduce motion" on, dark dashboard, `hvac_action: cooling` — confirm cool-blue glow visible but NOT animating
 - [ ] 6.10 Click within the dial while a dark pulse is active — confirm setpoint adjustment still works
+
+## 7. Digit glow reinforcement (follow-up tuning for dark-variant subtlety)
+
+In-flight addition responding to QA feedback that the dark-variant cool overlay remained too subtle at the breath's minimum. Adds a colored `filter: drop-shadow` on the center temperature digits that tracks the same `is-active-*` / `is-idle-*` state classes but is static (not animated).
+
+- [x] 7.1 Add `.dial--dark.is-active-cool` glow rule: 10px blur, rgba(0,122,241,0.85) on `.dial__lbl--ambient`, `--target`, `--low`, `--high`
+- [x] 7.2 Add `.dial--dark.is-idle-cool` glow rule: 6px blur, rgba(0,122,241,0.55) on same selectors
+- [x] 7.3 Add `.dial--dark.is-active-heat` glow rule: 10px blur, rgba(255,140,0,0.85) on same selectors
+- [x] 7.4 Add `.dial--dark.is-idle-heat` glow rule: 6px blur, rgba(255,140,0,0.55) on same selectors
+- [x] 7.5 Confirm no glow is applied in the light variant (no `.dial--light` glow rule added)
+- [x] 7.6 Bump `dist/main.js` banner + cache-busters from `0.1.9` to `0.1.10`
+- [x] 7.7 Update `README.md` with a `v0.1.10` changelog entry
+- [x] 7.8 Run `openspec validate dark-theme-activity-overlay --strict` — valid
+- [ ] 7.9 Manual QA: dark dashboard, active cooling — confirm cool-blue glow around the big digits is clearly visible and reads as "active + cool" at a glance
+- [ ] 7.10 Manual QA: dark dashboard, idle cool (mode=cool, action=idle) — confirm a softer cool-blue glow is present but clearly subtler than the active-cool glow
+- [ ] 7.11 Manual QA: dark dashboard, active heating — confirm warm-orange glow around the big digits
+- [ ] 7.12 Manual QA: dark dashboard, idle heat (mode=heat, action=idle) — confirm softer warm-orange glow
+- [ ] 7.13 Manual QA: dark dashboard, thermostat off — confirm NO glow (digits render with no filter)
+- [ ] 7.14 Manual QA: light dashboard, any active state — confirm light-variant digits still render without glow
+- [ ] 7.15 Manual QA: during the overlay pulse, confirm the glow does NOT pulse along (stays constant while the background overlay breathes)
