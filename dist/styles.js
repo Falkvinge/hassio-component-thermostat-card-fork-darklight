@@ -214,8 +214,8 @@ export function cssData(user) {
   .dial--light.is-active-heat::before {
     background: radial-gradient(
       circle at center,
-      rgba(255, 140, 0, 0.22) 0%,
-      rgba(255, 140, 0, 0.08) 45%,
+      rgba(255, 140, 0, 0.32) 0%,
+      rgba(255, 140, 0, 0.12) 45%,
       transparent 80%
     );
     animation: darklight-pulse 3s ease-in-out infinite;
@@ -223,8 +223,8 @@ export function cssData(user) {
   .dial--light.is-active-cool::before {
     background: radial-gradient(
       circle at center,
-      rgba(0, 122, 241, 0.22) 0%,
-      rgba(0, 122, 241, 0.08) 45%,
+      rgba(0, 122, 241, 0.32) 0%,
+      rgba(0, 122, 241, 0.12) 45%,
       transparent 80%
     );
     animation: darklight-pulse 3s ease-in-out infinite;
@@ -247,8 +247,8 @@ export function cssData(user) {
     );
   }
   @keyframes darklight-pulse {
-    0%, 100% { opacity: 0.40; }
-    50%      { opacity: 0.90; }
+    0%, 100% { opacity: 0.60; }
+    50%      { opacity: 1.00; }
   }
   @media (prefers-reduced-motion: reduce) {
     /* Only the active overlays animate; the idle tints are already
@@ -258,7 +258,7 @@ export function cssData(user) {
     .dial--dark.is-active-heat::before,
     .dial--dark.is-active-cool::before {
       animation: none;
-      opacity: 0.65;
+      opacity: 0.80;
     }
   }
   /* Differentiated activity overlay, dark variant.
@@ -281,12 +281,12 @@ export function cssData(user) {
     pointer-events: none;
     border-radius: inherit;
   }
-  /* Active (confirmed pumping): lower-alpha gradient, animated. */
+  /* Active (confirmed pumping): gradient alpha raised for dark bg, animated. */
   .dial--dark.is-active-heat::before {
     background: radial-gradient(
       circle at center,
-      rgba(255, 140, 0, 0.14) 0%,
-      rgba(255, 140, 0, 0.05) 45%,
+      rgba(255, 140, 0, 0.24) 0%,
+      rgba(255, 140, 0, 0.09) 45%,
       transparent 80%
     );
     animation: darklight-pulse 3s ease-in-out infinite;
@@ -294,8 +294,8 @@ export function cssData(user) {
   .dial--dark.is-active-cool::before {
     background: radial-gradient(
       circle at center,
-      rgba(0, 122, 241, 0.14) 0%,
-      rgba(0, 122, 241, 0.05) 45%,
+      rgba(0, 122, 241, 0.24) 0%,
+      rgba(0, 122, 241, 0.09) 45%,
       transparent 80%
     );
     animation: darklight-pulse 3s ease-in-out infinite;
@@ -304,16 +304,16 @@ export function cssData(user) {
   .dial--dark.is-idle-heat::before {
     background: radial-gradient(
       circle at center,
-      rgba(255, 140, 0, 0.07) 0%,
-      rgba(255, 140, 0, 0.025) 45%,
+      rgba(255, 140, 0, 0.12) 0%,
+      rgba(255, 140, 0, 0.05) 45%,
       transparent 80%
     );
   }
   .dial--dark.is-idle-cool::before {
     background: radial-gradient(
       circle at center,
-      rgba(0, 122, 241, 0.07) 0%,
-      rgba(0, 122, 241, 0.025) 45%,
+      rgba(0, 122, 241, 0.12) 0%,
+      rgba(0, 122, 241, 0.05) 45%,
       transparent 80%
     );
   }

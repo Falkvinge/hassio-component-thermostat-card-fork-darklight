@@ -65,6 +65,17 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.6 — 2026-04-23
+
+Raised activity overlay visibility for both themes — the pulse is now clearly distinguishable from "no activity" even when glanced at mid-cycle at its local minimum.
+
+- **Changed:** `@keyframes darklight-pulse` floor `0.40 → 0.60`, ceiling `0.90 → 1.00`. The glow at minimum is now unambiguous.
+- **Changed:** Dark active gradient alphas `0.14/0.05 → 0.24/0.09` — gradient itself more vivid on dark background.
+- **Changed:** Dark idle gradient alphas `0.07/0.025 → 0.12/0.05` — proportional bump, stays at ~half the active intensity.
+- **Changed:** Light active gradient alphas `0.22/0.08 → 0.32/0.12` — same proportional boost for light theme consistency.
+- **Changed:** `prefers-reduced-motion` fallback opacity `0.65 → 0.80` to match the new keyframe floor.
+- **Unchanged:** Light idle gradient values, all JS logic, HA integration surface.
+
 ### v0.1.5 — 2026-04-23
 
 Dark theme now has full activity overlay parity with the light theme.
