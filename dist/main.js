@@ -1,6 +1,6 @@
-import {cssData} from './styles.js?v=0.1.3';
-import ThermostatUI from './thermostat_card.lib.js?v=0.1.3';
-console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.3 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
+import {cssData} from './styles.js?v=0.1.4';
+import ThermostatUI from './thermostat_card.lib.js?v=0.1.4';
+console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.4 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 
 // Register with Home Assistant's card picker so this fork is identifiable
 // at card-configuration time. Without this, the "Add card" dialog would

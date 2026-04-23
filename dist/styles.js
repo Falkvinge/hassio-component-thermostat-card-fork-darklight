@@ -369,7 +369,7 @@ export function cssData(user) {
     dominant-baseline: central;
   }
   .dial__lbl--target {
-    font-size: 120px;
+    font-size: 150px;
     font-weight: bold;
     visibility: hidden;
   }
@@ -388,7 +388,7 @@ export function cssData(user) {
     visibility: visible;
   }
   .dial__lbl--ambient {
-    font-size: 120px;
+    font-size: 150px;
     font-weight: bold;
     visibility: visible;
   }
@@ -428,7 +428,7 @@ export function cssData(user) {
     font-weight: bold;
   }
   .dial__lbl--title {
-    font-size: 24px;
+    font-size: 32px;
   }
   `
   return css;

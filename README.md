@@ -65,6 +65,16 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.4 — 2026-04-23
+
+Readability improvements to the center-dial typography for better legibility on a wall-mounted dashboard viewed from across a room.
+
+- **Changed:** Ambient/target temperature digits enlarged **120px → 150px**. These are the primary at-a-glance readout and the previous size was hard to read at 3–4m without squinting.
+- **Changed:** Decimal superscript x-offset adjusted proportionally (`+20 → +28`) so the `.5` digit continues to sit cleanly to the right of the enlarged whole-digit text.
+- **Changed:** Room name title enlarged **24px → 32px** to keep the label in visual balance with the larger digits (24/150 = 16% read as a caption; 32/150 ≈ 21% reads as a proper label).
+- **Changed:** Title vertical position moved down slightly (`y = radius * 0.55` from `radius * 0.50`; 100 → 110 at the default 400-diameter SVG) so the title and temperature digits group as a single readout unit rather than floating apart.
+- **Unchanged:** Dual-setpoint low/high labels (90px), superscript font sizes, ring ticks, chevrons, dial geometry, dark/light theme behavior, HVAC overlay, HA integration surface.
+
 ### v0.1.3 — 2026-04-23
 
 Refinement of v0.1.2's active-state pulse, based on real-world observation that climate integrations often under-report activity (some report `hvac_action: idle` while the unit is audibly running; others never expose `hvac_action` at all).

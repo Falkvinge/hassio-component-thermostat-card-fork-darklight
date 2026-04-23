@@ -568,14 +568,14 @@ export default class ThermostatUI {
   _buildText(radius, name, offset) {
     const target = SvgUtil.createSVGElement('text', {
       x: radius + offset,
-      y: radius - (name == 'title' ? radius / 2 : 0),
+      y: radius - (name == 'title' ? radius * 0.45 : 0),
       class: `dial__lbl dial__lbl--${name}`,
       id: name
     });
     const text = SvgUtil.createSVGElement('tspan', {
     });
     // hack
-    if (name == 'target' || name == 'ambient') offset += 20;
+    if (name == 'target' || name == 'ambient') offset += 28;
     const superscript = SvgUtil.createSVGElement('tspan', {
       x: radius + radius / 3.1 + offset,
       y: radius - radius / 6,
