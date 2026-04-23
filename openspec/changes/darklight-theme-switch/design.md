@@ -48,27 +48,26 @@ function resolveThemeDark(hass):
 
 **Alternative considered:** A separate `updateTheme()` method on ThermostatUI. Rejected because it creates a second update path that can race with state updates. Keeping everything in one `updateState` call is simpler and avoids partial-render states.
 
-### 3. CSS class toggle on SVG root for variant switching
+### 3. CSS class toggle on dial container for variant switching
 
-**Choice:** Apply `dial--dark` or `dial--light` class on the SVG root element (the `<svg class="dial">` node). All variant-specific CSS uses these classes as selectors.
+**Choice:** Apply `dial--dark` or `dial--light` class on the `ThermostatUI._container` div — the top-level wrapper that holds the more-info icon, mode icon, SVG dial, and mode dialog as siblings.
 
 ```css
-.dial { /* defaults = dark values */ }
-.dial.dial--light {
+.dial--light .dial { /* SVG variant */
   --thermostat-off-fill: #e8e8e8;
   --thermostat-text-color: #333;
-  --thermostat-path-color: rgba(0, 0, 0, 0.15);
-  /* ... */
 }
+.dial--light .dot_r { background-color: #333; }
+.dial--light .dialog { background: rgba(255, 255, 255, 0.85); }
 ```
+
+**Why on the container, not the SVG root?** The SVG dial, the mode icon's `.dot_r`, and the mode `.dialog` are **siblings inside the container**, not descendants of the SVG. A class on the SVG can only reach SVG descendants via CSS. Putting it on the container lets all four DOM subtrees respond to the same class.
 
 **Why class toggle vs. generating two CSS strings?** A class toggle:
 - Keeps `cssData()` as a single function call at `setConfig` time (no re-injection of `<style>` needed)
-- Leverages CSS specificity naturally — `.dial.dial--light` overrides `.dial` defaults
+- Leverages CSS specificity naturally — `.dial--light .dial` overrides `.dial` defaults
 - Enables smooth CSS transitions between variants
 - Is the same pattern the card already uses for `in_control`, `has_dual`, `dial--edit`
-
-**Why on the SVG root vs. `ha-card`?** The SVG root is the natural scope — it's where all existing state classes live. The `ha-card` doesn't need variant awareness because the SVG's own custom properties cascade to all children.
 
 ### 4. Light variant color palette
 
@@ -93,7 +92,7 @@ Light accent colors are slightly darkened/saturated to maintain contrast on ligh
 
 ### 5. Where the class gets toggled
 
-**Choice:** `ThermostatUI.updateState()` receives `options.theme_dark` and calls `this._updateClass('dial--dark', isDark)` / `this._updateClass('dial--light', !isDark)`. This reuses the existing `_updateClass` helper that already manages `in_control`, `has_dual`, etc.
+**Choice:** `ThermostatUI.updateState()` receives `options.theme_dark` and toggles the class on `this._container` directly via `classList.toggle`. The existing `_updateClass` helper targets `this._root` (the SVG) and is not reused here, because the class needs to live on the container so sibling subtrees can respond. One extra line of direct `classList` manipulation is clearer than a helper parameterized on target element.
 
 ## Risks / Trade-offs
 
