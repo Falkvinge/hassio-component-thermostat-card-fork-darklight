@@ -1,1 +1,4 @@
 .git/credentials
+
+# Per-agent worktrees live here (see AGENTS.md)
+.worktree/
