@@ -1,5 +1,6 @@
 {
-  "name": "Climate thermostat card",
+  "name": "Climate thermostat card (darklight fork)",
   "render_readme": true,
-  "filename":"main.js"
+  "filename": "main.js",
+  "homeassistant": "2023.1.0"
 }

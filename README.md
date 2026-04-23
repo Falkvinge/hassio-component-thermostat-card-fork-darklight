@@ -1,65 +1,87 @@
-<!--
- * @Author        : fineemb
- * @Github        : https://github.com/fineemb
- * @Description   : 
- * @Date          : 2020-02-03 12:52:45
- * @LastEditors   : fineemb
- * @LastEditTime  : 2020-05-31 11:11:26
- -->
+# Lovelace Thermostat Card — Darklight Fork
 
-# Lovelace Thermostat Card
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+A circular thermostat card for Home Assistant Lovelace, rendered in SVG + CSS. This is the **darklight** fork of [`fineemb/lovelace-thermostat-card`](https://github.com/fineemb/lovelace-thermostat-card), which in turn builds on [Dal Hundal's CodePen](https://codepen.io/dalhundal/pen/KpabZB/) thermostat control.
 
-A simple thermostat implemented in CSS and SVG based on <a href="https://codepen.io/dalhundal/pen/KpabZB/">Thermostat Control</a> by Dal Hundal
- (<a href="https://codepen.io/dalhundal">@dalhundal</a>) on <a href="https://codepen.io">CodePen</a>
+Maintained at [`Falkvinge/hassio-component-thermostat-card-fork-darklight`](https://github.com/Falkvinge/hassio-component-thermostat-card-fork-darklight).
 
-+  Supports [HACS](https://github.com/custom-components/hacs) installation
-+  Extra ambient temperature
-+  Allow changing of Opration mode
-+  Allow avoid the card background
+## What this fork adds
 
-## Preview
-![](https://bbs.hassbian.com/data/attachment/forum/202003/14/172544q3ajp7742cbo757h.gif)
+- **Automatic dark/light theme switching.** The card watches `hass.themes.darkMode` and the selected Home Assistant theme. When the dashboard is in light mode (or the selected theme is "Google Light Theme"), the dial re-colors itself: light fill, dark text, light-appropriate HVAC accent colors, light mode dialog. When dark, the original visuals are used unchanged. No per-card configuration required.
+- Everything else the upstream card does: click-quadrant setpoint control, dual-setpoint (`heat_cool`) mode, HVAC mode selector overlay, ambient temperature display, `no_card` mode for use inside picture-elements, custom CSS variables for theming.
 
-## Update
-### v1.3.0
-+ fix icon
-+ Fix the problem that the title blocks the arrow button [#16](https://github.com/fineemb/lovelace-thermostat-card/issues/16#issue-622934186)
-+ Remove the small_i parameter and have done adaptive scaling
-## HACS Installation
-Search for Thermostat Card
-## Manual Installation
-1. Download `main.js` `thermostat_card.lib.js` `styles.js`
-1. Copy to `www\community\lovelace-thermostat-card`
-1. Add the following to your Lovelace resources
-    ``` yaml
-    resources:
-      - url: /hacsfiles/lovelace-thermostat-card/main.js
-        type: module
-    ```
-1. Add the following to your Lovelace config `views.cards` key
-    ```yaml
-    - type: custom:thermostat-card
-      entity: climate.gong_zuo_jian_kong_diao
-      title: 工作间
-    ```
-    Replace `climate.gong_zuo_jian_kong_diao` with your climate's entity_id and `工作间` with any name you'd like to name your climate with
+## Install via HACS (custom repository)
+
+1. Open HACS in your Home Assistant UI.
+2. Frontend → three-dot menu → **Custom repositories**.
+3. Add `https://github.com/Falkvinge/hassio-component-thermostat-card-fork-darklight` with category **Lovelace**.
+4. Install "Climate thermostat card (darklight fork)" from the list.
+5. HACS will place the files under `/hacsfiles/hassio-component-thermostat-card-fork-darklight/`.
+6. Add the resource (HACS usually does this automatically, but verify):
+   ```yaml
+   resources:
+     - url: /hacsfiles/hassio-component-thermostat-card-fork-darklight/main.js
+       type: module
+   ```
+7. Hard-refresh the browser (Ctrl+F5) so the new module loads.
+
+## Manual install
+
+1. Download `main.js`, `thermostat_card.lib.js`, and `styles.js` from the [latest release](https://github.com/Falkvinge/hassio-component-thermostat-card-fork-darklight/releases/latest).
+2. Copy all three files to `www/community/hassio-component-thermostat-card-fork-darklight/` inside your HA config directory.
+3. Add the resource to your Lovelace config:
+   ```yaml
+   resources:
+     - url: /hacsfiles/hassio-component-thermostat-card-fork-darklight/main.js
+       type: module
+   ```
+4. Hard-refresh.
+
+## Usage
+
+```yaml
+- type: custom:thermostat-card
+  entity: climate.living_room
+  title: Living Room
+```
+
+The custom element name `thermostat-card` is unchanged from upstream — any existing dashboard YAML written for `fineemb/lovelace-thermostat-card` works as-is.
 
 ## Options
 
-| Name | Type | Default | Description
-| ---- | ---- | ------- | -----------
-| type | string | **Required** | `custom:thermostat-card`
-| entity | string | **Required** | The entity id of climate entity. Example: `climate.hvac`
-| title | string | optional | Card title
-| no_card | boolean | false | Set to true to avoid the card background and use the custom element in picture-elements.
-| step | number | 0.5 | The step to use when increasing or decreasing temperature
-| highlight_tap | boolean | false | Show the tap area highlight when changing temperature settings
-| chevron_size | number | 50 | Size of chevrons for temperature adjutment
-| pending | number | 3 | Seconds to wait in control mode until state changes are sent back to the server
-| idle_zone | number | 2 | Degrees of minimum difference between set points when thermostat supports both heating and cooling
-| ambient_temperature | string | optional | An entity id of a sensor to use as `ambient_temperature` instead of the one provided by the thermostat
+| Name                  | Type    | Default      | Description                                                                                        |
+| --------------------- | ------- | ------------ | -------------------------------------------------------------------------------------------------- |
+| `type`                | string  | **Required** | `custom:thermostat-card`                                                                           |
+| `entity`              | string  | **Required** | Entity id of the climate entity. Example: `climate.hvac`                                           |
+| `title`               | string  | optional     | Card title                                                                                         |
+| `no_card`             | boolean | `false`      | When `true`, omit the `ha-card` chrome — for use inside `picture-elements`                          |
+| `step`                | number  | `0.5`        | Degrees per click when adjusting the setpoint                                                      |
+| `highlight_tap`       | boolean | `false`      | Briefly highlight the tap quadrant on interaction                                                  |
+| `chevron_size`        | number  | `50`         | Pixel size of the setpoint-adjust chevrons                                                         |
+| `pending`             | number  | `3`          | Seconds to wait in "control" state before committing a setpoint change to the backend              |
+| `idle_zone`           | number  | `2`          | Minimum degrees between low and high setpoints in dual (`heat_cool`) mode                           |
+| `ambient_temperature` | string  | optional     | Entity id of a sensor to use as the ambient reading, overriding the climate entity's own value     |
+
+## Changelog
+
+### v0.1.0 — 2026-04-23
+
+Initial release under the `Falkvinge/hassio-component-thermostat-card-fork-darklight` name. Based on upstream `fineemb/lovelace-thermostat-card` v1.3.0.
+
+- **New:** Automatic dark/light theme switching that follows `hass.themes.darkMode` and honors "Google Dark Theme" / "Google Light Theme" selected-theme overrides. The card's former visuals become the `dark` variant; a parallel `light` variant covers dial fill, text, ticks, chevrons, editable indicator, HVAC accent colors, mode-icon dot, and the HVAC mode dialog.
+- **Changed:** Card banner on the JS console now reads "Thermostat Card (darklight fork) / Version 0.1.0".
+- **Unchanged:** All pre-existing behavior from upstream v1.3.0 — user API, entity wiring, setpoint math, dual-mode logic, `no_card` mode.
+
+For the design and specification of the theme-switch feature, see `openspec/changes/darklight-theme-switch/` in the repo (pre-archive) or `openspec/specs/` (post-archive, future).
 
 ## Credits
-<a href="https://codepen.io/dalhundal">@dalhundal</a>
+
+- [@dalhundal](https://codepen.io/dalhundal) — original CodePen thermostat control
+- [Marius-Stefan Ciotlos & Silas Baronda](https://github.com/CM6/lovelace-thermostat-dark-card) — first Lovelace port
+- [@fineemb](https://github.com/fineemb) — `lovelace-thermostat-card` v1.3.0, the direct parent of this fork
+- [@Falkvinge](https://github.com/Falkvinge) — this fork
+
+## License
+
+MIT. See `LICENSE` for the full chain of copyright holders.
