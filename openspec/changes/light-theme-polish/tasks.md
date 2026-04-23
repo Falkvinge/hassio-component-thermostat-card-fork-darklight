@@ -34,7 +34,7 @@
 
 ## 7. Verification (manual, live HA)
 
-- [ ] 7.1 Light dashboard, thermostat in `off` state: confirm the dial fill reads as nearly-white, visibly lighter than before.
+- [x] 7.1 Light dashboard, thermostat in `off` state: confirm the dial fill reads as nearly-white, visibly lighter than before. *(verified: Bedroom / Guest Room / Lounge Main in 2×2 grid read as nearly pure white, clearly lighter than pre-v0.1.2 `#e8e8e8`)*
 - [ ] 7.2 Light dashboard, thermostat set to `heat` and actively heating (entity reports `hvac_action: heating`): confirm a warm-orange glow pulses on the card.
 - [ ] 7.3 Light dashboard, thermostat set to `heat` but at target (entity reports `hvac_action: idle`): confirm NO pulse.
 - [x] 7.4 Light dashboard, thermostat set to `cool` and actively cooling: confirm a cool-blue glow pulses. *(verified on Office Climate card under v0.1.3)*
@@ -61,7 +61,7 @@ Implementation revealed that tying the overlay strictly to `hvac_action: heating
 
 ### 8.11 Manual verification on live HA (retest + extend)
 
-- [ ] 8.11.1 Light dashboard, mode `cool`, `hvac_action: idle` (AC at setpoint): confirm a soft static cool-blue tint appears around the dial. No pulsing.
+- [x] 8.11.1 Light dashboard, mode `cool`, `hvac_action: idle` (AC at setpoint): confirm a soft static cool-blue tint appears around the dial. No pulsing. *(verified: Office Climate settled at target, tint stayed, pulse stopped)*
 - [x] 8.11.2 Light dashboard, mode `cool`, `hvac_action: cooling`: confirm the tint intensifies and begins pulsing. *(verified on Office Climate card)*
 - [ ] 8.11.3 Light dashboard, mode `heat`, `hvac_action: idle`: confirm a soft static warm-orange tint. No pulsing.
 - [ ] 8.11.4 Light dashboard, mode `heat`, `hvac_action: heating`: confirm warm-orange pulse.
@@ -70,4 +70,4 @@ Implementation revealed that tying the overlay strictly to `hvac_action: heating
 - [ ] 8.11.7 Light dashboard, entity without `hvac_action` attribute, mode `heat`: confirm warm-orange idle tint (not pulse). Same for `cool`.
 - [ ] 8.11.8 Dark dashboard, any mode / any action: confirm no overlay (dark variant unaffected).
 - [ ] 8.11.9 OS "Reduce motion" on, mode `cool`, `hvac_action: cooling`: confirm cool-blue glow is visible but not animating. Idle-tint cases already pass since they don't animate.
-- [ ] 8.11.10 Overview dashboard with several climate cards in mixed active/idle states: confirm at a glance you can tell "which are on" (any tint/pulse) from "which are confirmed pumping" (only pulsing ones).
+- [x] 8.11.10 Overview dashboard with several climate cards in mixed active/idle states: confirm at a glance you can tell "which are on" (any tint/pulse) from "which are confirmed pumping" (only pulsing ones). *(verified: 2×2 grid of Bedroom/Guest Room/Office/Lounge Main — Office unambiguously stands out as the active AC; three `off` cards recede into light dashboard)*
