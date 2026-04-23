@@ -37,7 +37,7 @@
 - [ ] 7.1 Light dashboard, thermostat in `off` state: confirm the dial fill reads as nearly-white, visibly lighter than before.
 - [ ] 7.2 Light dashboard, thermostat set to `heat` and actively heating (entity reports `hvac_action: heating`): confirm a warm-orange glow pulses on the card.
 - [ ] 7.3 Light dashboard, thermostat set to `heat` but at target (entity reports `hvac_action: idle`): confirm NO pulse.
-- [ ] 7.4 Light dashboard, thermostat set to `cool` and actively cooling: confirm a cool-blue glow pulses.
+- [x] 7.4 Light dashboard, thermostat set to `cool` and actively cooling: confirm a cool-blue glow pulses. *(verified on Office Climate card under v0.1.3)*
 - [ ] 7.5 Light dashboard, climate entity that doesn't expose `hvac_action` with state = `heat`: confirm warm-orange pulse appears (fallback path).
 - [ ] 7.6 Dark dashboard with any HVAC action: confirm NO pulse (dark variant is unaffected).
 - [ ] 7.7 `no_card: true` instance inside picture-elements, actively heating on a light dashboard: confirm the pulse renders directly on the dashboard background.
@@ -62,7 +62,7 @@ Implementation revealed that tying the overlay strictly to `hvac_action: heating
 ### 8.11 Manual verification on live HA (retest + extend)
 
 - [ ] 8.11.1 Light dashboard, mode `cool`, `hvac_action: idle` (AC at setpoint): confirm a soft static cool-blue tint appears around the dial. No pulsing.
-- [ ] 8.11.2 Light dashboard, mode `cool`, `hvac_action: cooling`: confirm the tint intensifies and begins pulsing.
+- [x] 8.11.2 Light dashboard, mode `cool`, `hvac_action: cooling`: confirm the tint intensifies and begins pulsing. *(verified on Office Climate card)*
 - [ ] 8.11.3 Light dashboard, mode `heat`, `hvac_action: idle`: confirm a soft static warm-orange tint. No pulsing.
 - [ ] 8.11.4 Light dashboard, mode `heat`, `hvac_action: heating`: confirm warm-orange pulse.
 - [ ] 8.11.5 Light dashboard, mode `off`: confirm no overlay at all.
