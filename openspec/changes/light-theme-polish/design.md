@@ -41,21 +41,46 @@ Home Assistant exposes two climate-entity signals that matter here:
 
 This is a one-line change: the `--thermostat-off-fill` value in the `.dial--light .dial { ... }` block.
 
-### 2. Active signal: `hvac_action` first, `hvac_state` fallback
+### 2. Activity signal: differentiated active-vs-idle, two visual intensities
 
-**Why `hvac_action`?** It answers "is this climate actively pumping heat/cool right now?" — which is exactly the question "is this AC running?". A climate set to `heat` but at target reports `hvac_action: idle`; the pulse should NOT show then, or the signal is meaningless.
+**Revised in v0.1.3 follow-up.** Original design (v0.1.2) trusted `hvac_action` as the sole gate: no pulse when `hvac_action: idle`. Field testing surfaced two problems:
 
-**Why fall back to `hvac_state`?** Not every climate integration populates `hvac_action`. Older integrations, generic_thermostat without explicit heater_entity, some cloud-based climates. Without a fallback, those entities get no pulse ever — worse than a slightly lower-fidelity pulse.
+1. **Idle ≠ off from the user's perspective.** An AC in `cool` mode at setpoint reports `hvac_action: idle` but the compressor may still be running (cycling on/off). The user's actual question — "where is the AC noise in the apartment coming from?" — requires a signal even when the integration says "idle".
+2. **Data quality.** At least one climate integration observed in testing reports `hvac_action: idle` while the physical unit is audibly pumping. Binding the pulse strictly to `hvac_action` throws away the correct signal in those cases.
 
-**Fallback mapping:**
-- `hvac_state === 'heat'` → active_mode = `'heat'` (may over-report when target reached; acceptable trade-off)
-- `hvac_state === 'cool'` → active_mode = `'cool'` (same)
-- `hvac_state === 'auto'` or `'heat_cool'` → active_mode = `null` (direction unknown without action signal; conservative)
-- Anything else (`off`, `dry`, `fan_only`, unknown) → `null`
+**Revised design — two overlay intensities, mutually exclusive:**
 
-**Derivation lives in `main.js`, not in the view.** Same pattern as `theme_dark`: derived in the `hass` setter, added to `new_state`, included in the diff, passed to `updateState(options, hass)`. The view reads `options.active_mode` and toggles classes.
+| Condition | Class | Visual |
+|---|---|---|
+| `hvac_action: heating` | `is-active-heat` | Pulsing warm-orange glow (animated) |
+| `hvac_action: cooling` | `is-active-cool` | Pulsing cool-blue glow (animated) |
+| Mode `heat`, `hvac_action` not active (idle / missing / off / etc.) | `is-idle-heat` | Static warm-orange tint (~½ alpha, no animation) |
+| Mode `cool`, `hvac_action` not active | `is-idle-cool` | Static cool-blue tint (~½ alpha, no animation) |
+| Mode `off`, `auto`, `heat_cool`, `dry`, `fan_only`, or unknown | *(no class)* | No overlay |
 
-### 3. Pulse implementation: `::before` pseudo-element with opacity animation
+The pulsing overlay unambiguously signals **confirmed active pumping**; the static tint signals **this AC is switched on to heat/cool**. A glance at the dashboard answers both "which ACs are on?" (any tint or pulse) and "which are confirmed running right now?" (only pulsing ones).
+
+**Why `auto` / `heat_cool` → no overlay:** direction is ambiguous without a current action signal, and painting both warm and cool tints simultaneously would be noisy. Acceptable loss; users with those modes can rely on the existing mode-icon dot for direction.
+
+**Fallback rationale for missing `hvac_action`:** previously the fallback mapped `state: heat` → active pulse. That was too generous — we claimed confirmed pumping on pure mode information. The revised mapping sends `hvac_action`-less entities to the idle-tint bucket instead. They still get a visible signal; they just don't falsely claim to be actively pumping.
+
+**`active_mode` return values:** `'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null`.
+
+**Decision table (implemented in `deriveActiveMode(entity)`):**
+
+| `hvac_action` | `entity.state` | `active_mode` |
+|---|---|---|
+| `'heating'` | (any) | `'active_heat'` |
+| `'cooling'` | (any) | `'active_cool'` |
+| any other value | `'heat'` | `'idle_heat'` |
+| any other value | `'cool'` | `'idle_cool'` |
+| undefined | `'heat'` | `'idle_heat'` |
+| undefined | `'cool'` | `'idle_cool'` |
+| (any) | `'off'`, `'auto'`, `'heat_cool'`, `'dry'`, `'fan_only'`, unknown | `null` |
+
+**Derivation lives in `main.js`, not in the view.** Same pattern as `theme_dark`: derived in the `hass` setter, added to `new_state`, included in the diff (via the `hvac_action` field, which covers all transitions since `active_mode` is derived from it plus `state`), passed to `updateState(options, hass)`. The view reads `options.active_mode` and toggles one of four classes.
+
+### 3. Overlay implementation: `::before` pseudo-element with opacity animation (active) or static opacity (idle)
 
 **Options considered:**
 - **Animate `background-image` gradient keyframes directly** on the container. Rejected: gradient interpolation between keyframes is browser-specific and often not smooth; most engines snap between keyframes instead of interpolating stop positions.
@@ -63,12 +88,13 @@ This is a one-line change: the `--thermostat-off-fill` value in the `.dial--ligh
 - **Real `<div>` child element inserted by JS.** Requires DOM changes in `thermostat_card.lib.js`, more code than necessary. The pseudo-element approach needs only CSS.
 - **Pseudo-element with fixed radial gradient, animate `opacity`.** Cleanest: opacity animations are GPU-accelerated (transform/opacity are the two CSS properties browsers reliably composite off-main-thread), the gradient stays static, and the visual effect is exactly "breathing brightness."
 
-**Choice:** the pseudo-element approach. The container gets `position: relative`; `.dial--light.is-active-heat::before` (and `-cool`) sets `position: absolute; inset: 0; pointer-events: none; border-radius: inherit;` plus a radial gradient and an `animation` targeting opacity.
+**Choice:** the pseudo-element approach. The container gets `position: relative`; all four class selectors (`.dial--light.is-active-heat::before`, `-active-cool`, `-idle-heat`, `-idle-cool`) share the common `position: absolute; inset: 0; pointer-events: none; border-radius: inherit;` declarations. The active classes add an opacity animation and full-alpha gradient; the idle classes use a reduced-alpha gradient and omit the animation (static tint).
 
 **Layering:** `::before` is behind normal-flow children by default, so the SVG dial, `.climate_info`, and the mode dialog render on top of the overlay naturally. No `z-index` juggling needed.
 
 ### 4. Gradient parameters
 
+**Active (pulsing) overlay:**
 ```css
 background: radial-gradient(
   circle at center,
@@ -78,14 +104,24 @@ background: radial-gradient(
 );
 ```
 
+**Idle (static) overlay:**
+```css
+background: radial-gradient(
+  circle at center,
+  <color at 0.10 alpha> 0%,
+  <color at 0.04 alpha> 45%,
+  transparent 80%
+);
+```
+
 - "Circle at center" — the user asked for center-prominent.
-- Stop positions: peak hits the inner ~45% of the card at meaningful alpha, tails off to invisible before the edge. This keeps rounded corners clean even if `border-radius: inherit` were ever bypassed.
-- Alpha values: tuned empirically. 0.22 at the center is roughly 22% tint — noticeable on white, not overwhelming. Final values may need adjustment after seeing on real dashboards; they're CSS-tunable without code changes.
+- Stop positions identical across active and idle: peak hits the inner ~45%, tails off before the edge. Keeps rounded corners clean even if `border-radius: inherit` were ever bypassed.
+- Idle alphas are ~45% of active alphas. Combined with the pulse cycling between 0.40 and 0.90 opacity, the idle static tint (at effective alpha ~0.10) sits visibly below the pulse's minimum (0.22 × 0.40 ≈ 0.088 effective) when averaged over the cycle, so active cards still read "more present" than idle-tinted ones.
 
 **Warm orange:** `rgba(255, 140, 0, α)` — same hue family as the existing `--heat_color: #ff8100`.
 **Cool blue:** `rgba(0, 122, 241, α)` — same hue family as `--cool_color`.
 
-These match the mode accents users already associate with heating/cooling, so the pulse reinforces the mode tint rather than introducing a new color vocabulary.
+These match the mode accents users already associate with heating/cooling, so the overlay reinforces the mode tint rather than introducing a new color vocabulary.
 
 ### 5. Animation timing
 
@@ -113,19 +149,21 @@ These match the mode accents users already associate with heating/cooling, so th
 }
 ```
 
-Animation off; static midpoint opacity so the color signal is still conveyed without movement. Non-negotiable: unbounded loops in peripheral vision are a known accessibility pain point.
+Animation off on the active overlays; static midpoint opacity so the color signal is still conveyed without movement. The idle-tint overlays are already static and unaffected by the media query. Non-negotiable: unbounded loops in peripheral vision are a known accessibility pain point.
 
 ### 7. Class toggle placement
 
 In `ThermostatUI.updateState()`, after the existing `dial--dark`/`dial--light` toggle:
 
 ```js
-const active = options.active_mode; // 'heat' | 'cool' | null
-this._container.classList.toggle('is-active-heat', active === 'heat');
-this._container.classList.toggle('is-active-cool', active === 'cool');
+const m = options.active_mode; // 'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null
+this._container.classList.toggle('is-active-heat', m === 'active_heat');
+this._container.classList.toggle('is-active-cool', m === 'active_cool');
+this._container.classList.toggle('is-idle-heat',   m === 'idle_heat');
+this._container.classList.toggle('is-idle-cool',   m === 'idle_cool');
 ```
 
-Same pattern as the theme toggle from darklight-theme-switch. No new helper needed.
+At most one class is set at a time because the five return values of `deriveActiveMode` are mutually exclusive. Same toggle pattern as the theme class from darklight-theme-switch.
 
 ### 8. `no_card` mode compatibility
 
@@ -135,7 +173,7 @@ Same pattern as the theme toggle from darklight-theme-switch. No new helper need
 
 **[Color tuning is empirical]** → CSS values in this design are starting points. Final alpha levels, stop positions, and animation timing may need one round of adjustment after the change is installed on a real dashboard. All tunable from `styles.js` without touching JS.
 
-**[`hvac_state` fallback over-reports]** → A climate set to `heat` but currently at target (idle in reality) will still pulse under the fallback path. Acceptable because the fallback only triggers for entities that don't report `hvac_action` at all, and the user likely prefers "pulse when set to heat" over "never pulse". Documented in the spec as a known limitation.
+**[`hvac_state` fallback lands in idle tint, never active pulse]** → In the revised (v0.1.3) design, an entity that doesn't expose `hvac_action` never reaches the pulsing state — it's capped at the idle tint. Trade-off accepted because the pulse is a *confirmed-pumping* signal; without `hvac_action` we cannot confirm pumping, and over-claiming via pulse defeats the purpose of the differentiation. Users with `hvac_action`-less entities still get a meaningful "this AC is switched on" signal via the tint.
 
 **[Pulse on many cards may look busy]** → If a user has a dashboard with 10 climate cards all running, 10 pulsing glows could feel chaotic. Mitigation: animation is offset per-card naturally because each card's `animation-start` is its DOM load time; they won't phase-lock. If this proves distracting in practice, we can add an `animation-delay: calc(var(--card-index, 0) * 0.3s)` strategy in a follow-up. Not pre-optimizing here.
 

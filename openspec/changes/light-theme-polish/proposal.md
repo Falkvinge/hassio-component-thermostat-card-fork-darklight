@@ -10,7 +10,11 @@ Both are light-theme-first concerns because the user base driving this work is o
 ## What Changes
 
 - **Softer off-state background for the light variant.** Replace the current `#e8e8e8` off-fill with a near-white value (`#f7f7f7` or lighter) so an off thermostat almost disappears into a light dashboard. Applies only when `dial--light` is active. Dark variant is unchanged.
-- **Animated "active" state pulse, light variant only.** When the climate entity reports `hvac_action: heating` (or `hvac_action: cooling`), layer a soft radial-gradient glow on the card container — centered, fading to transparent at the edges — in a pale warm orange for heating or pale cool blue for cooling. A slow 3-second opacity pulse (~0.4 → 0.9 → 0.4) makes the glow noticeable at a glance across a dashboard without stealing attention. When `hvac_action` is not reported by the entity, fall back to `hvac_state` (`heat` → warm, `cool` → cool); other modes get no pulse. In `auto` / `heat_cool` modes the pulse follows whichever direction the action actually is — if the action is unknown, no pulse.
+- **Differentiated activity overlay, light variant only.** Two visual intensities based on what the climate entity reports:
+  - **Pulsing glow** when `hvac_action: heating` / `cooling` — a 3-second opacity pulse (~0.4 → 0.9 → 0.4) on a warm-orange or cool-blue radial gradient centered on the card. Signals *confirmed active pumping*.
+  - **Static tint** when mode is `heat` / `cool` but `hvac_action` isn't active (idle, missing, or not exposed at all). Same gradient at reduced alpha, no animation. Signals *this AC is switched on*.
+  - No overlay in `off`, `auto`, `heat_cool`, `dry`, `fan_only`, or unknown states.
+  The two-tier design keeps dashboard scanning effective even when climate integrations under-report or omit `hvac_action`, which happens in practice (observed: AC audibly running while entity reports `hvac_action: idle`).
 - **`hvac_action` added to state extraction.** The card's state diff gains one field so a transition in/out of active pumping triggers a re-render even when setpoints haven't moved.
 - **No change to public API, YAML config format, or the `thermostat-card` custom element name.** This is a 0.1.x point release.
 
@@ -22,13 +26,13 @@ Both are light-theme-first concerns because the user base driving this work is o
 
 ### Modified Capabilities
 
-- `styling`: adds light-variant off-fill refinement and the active-state pulse layer + keyframe animation. Scoped by the `dial--light` class introduced in the darklight-theme-switch change.
-- `thermostat-card`: extends state extraction to include `hvac_action` and a derived `active_mode` (`'heat' | 'cool' | null`) that CSS targets via container classes.
+- `styling`: adds light-variant off-fill refinement and the differentiated activity overlay (four class selectors × one shared pseudo-element × active/idle variants + keyframe animation). Scoped by the `dial--light` class introduced in the darklight-theme-switch change.
+- `thermostat-card`: extends state extraction to include `hvac_action` and a derived `active_mode` (`'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null`) that CSS targets via four mutually-exclusive container classes.
 
 ## Impact
 
 - **Code:** `dist/main.js` (state extraction + diff), `dist/thermostat_card.lib.js` (container class toggles), `dist/styles.js` (light-variant overrides + `::before` pulse layer + `@keyframes`).
 - **Dependencies:** none. Standard CSS animations; no JS timers, no external libs.
-- **Backwards compat:** fully preserved. Entities that don't report `hvac_action` silently fall back to `hvac_state`. Dark-variant rendering is untouched. Picture-elements `no_card` mode keeps working because the pulse layer targets `this._container`, which exists in both chrome modes.
-- **Performance:** one extra pseudo-element with an opacity animation per active card. GPU-accelerated, negligible.
+- **Backwards compat:** fully preserved. Entities that don't report `hvac_action` fall back to an idle tint (never an active pulse, since pumping can't be confirmed). Dark-variant rendering is untouched. Picture-elements `no_card` mode keeps working because the overlay targets `this._container`, which exists in both chrome modes.
+- **Performance:** one extra pseudo-element per card (static or animated). Only active-class overlays animate. Opacity animation is GPU-accelerated; negligible cost.
 - **Assumes:** the `darklight-theme-switch` change lands first (or concurrently). This change references the `dial--light` class and the `_container` element that darklight introduces. If darklight is reverted, this change's light-variant rules become dead CSS but cause no runtime error.

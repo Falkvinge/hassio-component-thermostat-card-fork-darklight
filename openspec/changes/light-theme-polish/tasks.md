@@ -43,3 +43,31 @@
 - [ ] 7.7 `no_card: true` instance inside picture-elements, actively heating on a light dashboard: confirm the pulse renders directly on the dashboard background.
 - [ ] 7.8 Enable OS "Reduce motion" setting, reload: confirm the glow still shows (static) but no longer pulses.
 - [ ] 7.9 Click within the dial while a pulse is active: confirm setpoint adjustment still works (overlay is not blocking clicks).
+
+## 8. Follow-up: Differentiated active/idle overlay (v0.1.3)
+
+Implementation revealed that tying the overlay strictly to `hvac_action: heating|cooling` drops the signal in two real-world cases: (a) entities that never expose `hvac_action`, (b) entities that report `hvac_action: idle` while the physical unit is audibly pumping. The user confirmed the "differentiated" option (full pulse for confirmed pumping, static tint for mode-on-but-idle). Specs and design have been updated in place; tasks below implement the revision.
+
+- [ ] 8.1 Refactor `deriveActiveMode(entity)` in `dist/main.js` to return `'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null` per the decision table in `design.md` §2.
+- [ ] 8.2 In `ThermostatUI.updateState()` (`dist/thermostat_card.lib.js`), replace the two `is-active-*` toggles with four mutually-exclusive toggles: `is-active-heat`, `is-active-cool`, `is-idle-heat`, `is-idle-cool`.
+- [ ] 8.3 In `dist/styles.js`, extend the `::before` common-declarations selector list to include the two new idle classes. The shared rules (`content`, `position`, `inset`, `pointer-events`, `border-radius`) apply to all four.
+- [ ] 8.4 Move the `animation: darklight-pulse ...` declaration off the common rule and into the two `is-active-*` rules only, so the idle classes don't animate.
+- [ ] 8.5 Add `.dial--light.is-idle-heat::before` and `.dial--light.is-idle-cool::before` rules with reduced-alpha radial gradients (warm `rgba(255, 140, 0, 0.10)` → `0.04` → transparent, cool `rgba(0, 122, 241, 0.10)` → `0.04` → transparent).
+- [ ] 8.6 Confirm the `prefers-reduced-motion` media query still targets only the active rules (idle tint is already static, not affected).
+- [ ] 8.7 Sanity: `node --check` passes on the three `dist/*.js` files; CSS brace balance holds.
+- [ ] 8.8 Bump version strings in `dist/main.js` from `0.1.2` to `0.1.3`.
+- [ ] 8.9 Add a v0.1.3 changelog entry to `README.md`.
+- [ ] 8.10 Commit on a fresh `agent/light-theme-polish-diff` worktree, merge `--no-ff` into master, tag `v0.1.3`, push master + tag, create the GitHub release with the three `dist/*.js` assets.
+
+### 8.11 Manual verification on live HA (retest + extend)
+
+- [ ] 8.11.1 Light dashboard, mode `cool`, `hvac_action: idle` (AC at setpoint): confirm a soft static cool-blue tint appears around the dial. No pulsing.
+- [ ] 8.11.2 Light dashboard, mode `cool`, `hvac_action: cooling`: confirm the tint intensifies and begins pulsing.
+- [ ] 8.11.3 Light dashboard, mode `heat`, `hvac_action: idle`: confirm a soft static warm-orange tint. No pulsing.
+- [ ] 8.11.4 Light dashboard, mode `heat`, `hvac_action: heating`: confirm warm-orange pulse.
+- [ ] 8.11.5 Light dashboard, mode `off`: confirm no overlay at all.
+- [ ] 8.11.6 Light dashboard, mode `auto` or `heat_cool`, any action: confirm no overlay (direction is ambiguous).
+- [ ] 8.11.7 Light dashboard, entity without `hvac_action` attribute, mode `heat`: confirm warm-orange idle tint (not pulse). Same for `cool`.
+- [ ] 8.11.8 Dark dashboard, any mode / any action: confirm no overlay (dark variant unaffected).
+- [ ] 8.11.9 OS "Reduce motion" on, mode `cool`, `hvac_action: cooling`: confirm cool-blue glow is visible but not animating. Idle-tint cases already pass since they don't animate.
+- [ ] 8.11.10 Overview dashboard with several climate cards in mixed active/idle states: confirm at a glance you can tell "which are on" (any tint/pulse) from "which are confirmed pumping" (only pulsing ones).
