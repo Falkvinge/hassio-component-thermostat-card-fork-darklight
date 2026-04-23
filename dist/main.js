@@ -1,6 +1,6 @@
-import {cssData} from './styles.js?v=0.1.7';
-import ThermostatUI from './thermostat_card.lib.js?v=0.1.7';
-console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.7 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
+import {cssData} from './styles.js?v=0.1.8';
+import ThermostatUI from './thermostat_card.lib.js?v=0.1.8';
+console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.8 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 
 // Register with Home Assistant's card picker so this fork is identifiable
 // at card-configuration time. Without this, the "Add card" dialog would
@@ -191,13 +191,22 @@ function deriveActiveMode(entity) {
 
 // Resolve HA theme mode to a boolean: true = dark, false = light.
 // hass.themes.selectedTheme is a ThemeSettings object { theme, dark?, ... },
-// not a string. Its .dark field, when present, is the most specific signal
-// (reflects the per-theme dark/light preference HA applies at runtime).
-// hass.themes.darkMode is the global toggle and the fallback.
-// Missing theme data defaults to dark (backward-compatible).
+// not a string; the theme *name* lives at selectedTheme.theme.
+//
+// Priority:
+//   1. Named-theme overrides. "Google Dark Theme" / "Google Light Theme" are
+//      authoritative: the name specifies the intended appearance and HA's
+//      dark/light toggle can be set incoherently for these (e.g. a user can
+//      apply "Google Dark Theme" while the toggle still says light mode).
+//   2. selectedTheme.dark — HA's per-theme runtime flag, when present.
+//   3. hass.themes.darkMode — the global dashboard toggle.
+//   4. Default to dark for missing data (backward-compatible).
 function resolveThemeDark(hass) {
   if (!hass || !hass.themes) return true;
   const sel = hass.themes.selectedTheme;
+  const name = sel && sel.theme;
+  if (name === 'Google Dark Theme') return true;
+  if (name === 'Google Light Theme') return false;
   if (sel && typeof sel.dark === 'boolean') return sel.dark;
   const darkMode = hass.themes.darkMode;
   return darkMode === undefined ? true : !!darkMode;

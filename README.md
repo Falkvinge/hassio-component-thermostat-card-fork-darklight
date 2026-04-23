@@ -65,13 +65,25 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.8 — 2026-04-23
+
+Correctly restored named-theme overrides in the theme-mode detection (the fix in v0.1.7 was partially wrong — it dropped the named-theme priority that the original design intended).
+
+- **Fixed:** Named-theme overrides now work. `"Google Dark Theme"` / `"Google Light Theme"` are authoritative when set, because these named themes have a fixed intended appearance and HA's own dark/light toggle can be out of sync with them. The v0.1.7 change removed this priority incorrectly; v0.1.8 restores it with the right object-property access (`selectedTheme.theme`, not `selectedTheme` as a string).
+- **Priority order in `resolveThemeDark()`:**
+  1. `selectedTheme.theme === "Google Dark Theme"` → dark
+  2. `selectedTheme.theme === "Google Light Theme"` → light
+  3. `selectedTheme.dark` (per-theme runtime flag) if present
+  4. `hass.themes.darkMode` (global toggle)
+  5. Default dark
+
 ### v0.1.7 — 2026-04-23
 
 Fixed dark/light theme auto-detection not following HA's runtime theme switch.
 
 - **Fixed:** `resolveThemeDark` was comparing `hass.themes.selectedTheme` to the strings `"Google Dark Theme"` / `"Google Light Theme"`, but `selectedTheme` is a **ThemeSettings object** (`{ theme, dark?, ... }`), not a string — so those comparisons always evaluated to `false` and the name-based overrides never fired.
-- **Fixed (design):** Even if the string comparison had worked, a theme named "Google Dark Theme" can be used in both light and dark mode (HA's `darkMode` toggle controls the variant), so overriding based on name alone was architecturally wrong.
-- **Changed:** Detection now reads `selectedTheme.dark` first (HA's per-theme dark preference, the most specific signal), then falls back to `hass.themes.darkMode` (the global toggle). Named-theme string overrides removed entirely.
+- **Note:** v0.1.7 incorrectly dropped the named-theme priority altogether. See v0.1.8 for the correct restoration.
+- **Changed:** Detection reads `selectedTheme.dark` first, then falls back to `hass.themes.darkMode`.
 
 ### v0.1.6 — 2026-04-23
 
