@@ -38,7 +38,7 @@
 - [ ] 7.2 Light dashboard, thermostat set to `heat` and actively heating (entity reports `hvac_action: heating`): confirm a warm-orange glow pulses on the card.
 - [ ] 7.3 Light dashboard, thermostat set to `heat` but at target (entity reports `hvac_action: idle`): confirm NO pulse.
 - [x] 7.4 Light dashboard, thermostat set to `cool` and actively cooling: confirm a cool-blue glow pulses. *(verified on Office Climate card under v0.1.3)*
-- [ ] 7.5 Light dashboard, climate entity that doesn't expose `hvac_action` with state = `heat`: confirm warm-orange pulse appears (fallback path).
+- [x] 7.5 ~~Light dashboard, climate entity that doesn't expose `hvac_action` with state = `heat`: confirm warm-orange pulse appears (fallback path).~~ *Superseded by v0.1.3 design change: entities without `hvac_action` now yield an idle tint, not an active pulse. See §8.11.7 for the revised scenario.*
 - [ ] 7.6 Dark dashboard with any HVAC action: confirm NO pulse (dark variant is unaffected).
 - [ ] 7.7 `no_card: true` instance inside picture-elements, actively heating on a light dashboard: confirm the pulse renders directly on the dashboard background.
 - [ ] 7.8 Enable OS "Reduce motion" setting, reload: confirm the glow still shows (static) but no longer pulses.
