@@ -254,10 +254,68 @@ export function cssData(user) {
     /* Only the active overlays animate; the idle tints are already
        static and don't need overriding. */
     .dial--light.is-active-heat::before,
-    .dial--light.is-active-cool::before {
+    .dial--light.is-active-cool::before,
+    .dial--dark.is-active-heat::before,
+    .dial--dark.is-active-cool::before {
       animation: none;
       opacity: 0.65;
     }
+  }
+  /* Differentiated activity overlay, dark variant.
+     Mirrors the light overlay structure with alpha values scaled to
+     ~0.65× of the light values. The same RGB hues (orange / blue)
+     appear much more vivid against the near-black dial fill, so
+     lower alphas are needed to achieve a similarly subtle glow.
+     The @keyframes darklight-pulse and the is-* class toggling in
+     thermostat_card.lib.js are shared and need no changes. */
+  .dial--dark {
+    position: relative;
+  }
+  .dial--dark.is-active-heat::before,
+  .dial--dark.is-active-cool::before,
+  .dial--dark.is-idle-heat::before,
+  .dial--dark.is-idle-cool::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  /* Active (confirmed pumping): lower-alpha gradient, animated. */
+  .dial--dark.is-active-heat::before {
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 140, 0, 0.14) 0%,
+      rgba(255, 140, 0, 0.05) 45%,
+      transparent 80%
+    );
+    animation: darklight-pulse 3s ease-in-out infinite;
+  }
+  .dial--dark.is-active-cool::before {
+    background: radial-gradient(
+      circle at center,
+      rgba(0, 122, 241, 0.14) 0%,
+      rgba(0, 122, 241, 0.05) 45%,
+      transparent 80%
+    );
+    animation: darklight-pulse 3s ease-in-out infinite;
+  }
+  /* Idle (mode armed but not pumping): ~half-alpha of active, static. */
+  .dial--dark.is-idle-heat::before {
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 140, 0, 0.07) 0%,
+      rgba(255, 140, 0, 0.025) 45%,
+      transparent 80%
+    );
+  }
+  .dial--dark.is-idle-cool::before {
+    background: radial-gradient(
+      circle at center,
+      rgba(0, 122, 241, 0.07) 0%,
+      rgba(0, 122, 241, 0.025) 45%,
+      transparent 80%
+    );
   }
   /* HVAC accent colors tuned for contrast on light backgrounds. Each
      mode keeps its identity from the dark variant; saturation and

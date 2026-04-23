@@ -65,6 +65,14 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.5 — 2026-04-23
+
+Dark theme now has full activity overlay parity with the light theme.
+
+- **New (dark theme):** Warm-orange glow for heating, cool-blue glow for cooling — same two-tier system as light: animated pulse when `hvac_action` confirms active pumping, static dim tint when the mode is armed but idle.
+- **Unchanged:** Light theme overlay, all JS logic, HA integration surface. The `is-active-*` / `is-idle-*` classes were already being toggled on the container for both themes; this change adds the corresponding dark-scoped CSS rules.
+- **Alpha calibration:** Dark variant uses ~0.65× the alpha of the light variant (active: 0.14/0.05 vs 0.22/0.08; idle: 0.07/0.025 vs 0.10/0.04) because the same colors appear more vivid against the near-black dial fill.
+
 ### v0.1.4 — 2026-04-23
 
 Readability improvements to the center-dial typography for better legibility on a wall-mounted dashboard viewed from across a room.
