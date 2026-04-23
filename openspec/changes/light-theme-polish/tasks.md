@@ -48,16 +48,16 @@
 
 Implementation revealed that tying the overlay strictly to `hvac_action: heating|cooling` drops the signal in two real-world cases: (a) entities that never expose `hvac_action`, (b) entities that report `hvac_action: idle` while the physical unit is audibly pumping. The user confirmed the "differentiated" option (full pulse for confirmed pumping, static tint for mode-on-but-idle). Specs and design have been updated in place; tasks below implement the revision.
 
-- [ ] 8.1 Refactor `deriveActiveMode(entity)` in `dist/main.js` to return `'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null` per the decision table in `design.md` §2.
-- [ ] 8.2 In `ThermostatUI.updateState()` (`dist/thermostat_card.lib.js`), replace the two `is-active-*` toggles with four mutually-exclusive toggles: `is-active-heat`, `is-active-cool`, `is-idle-heat`, `is-idle-cool`.
-- [ ] 8.3 In `dist/styles.js`, extend the `::before` common-declarations selector list to include the two new idle classes. The shared rules (`content`, `position`, `inset`, `pointer-events`, `border-radius`) apply to all four.
-- [ ] 8.4 Move the `animation: darklight-pulse ...` declaration off the common rule and into the two `is-active-*` rules only, so the idle classes don't animate.
-- [ ] 8.5 Add `.dial--light.is-idle-heat::before` and `.dial--light.is-idle-cool::before` rules with reduced-alpha radial gradients (warm `rgba(255, 140, 0, 0.10)` → `0.04` → transparent, cool `rgba(0, 122, 241, 0.10)` → `0.04` → transparent).
-- [ ] 8.6 Confirm the `prefers-reduced-motion` media query still targets only the active rules (idle tint is already static, not affected).
-- [ ] 8.7 Sanity: `node --check` passes on the three `dist/*.js` files; CSS brace balance holds.
-- [ ] 8.8 Bump version strings in `dist/main.js` from `0.1.2` to `0.1.3`.
-- [ ] 8.9 Add a v0.1.3 changelog entry to `README.md`.
-- [ ] 8.10 Commit on a fresh `agent/light-theme-polish-diff` worktree, merge `--no-ff` into master, tag `v0.1.3`, push master + tag, create the GitHub release with the three `dist/*.js` assets.
+- [x] 8.1 Refactor `deriveActiveMode(entity)` in `dist/main.js` to return `'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null` per the decision table in `design.md` §2.
+- [x] 8.2 In `ThermostatUI.updateState()` (`dist/thermostat_card.lib.js`), replace the two `is-active-*` toggles with four mutually-exclusive toggles: `is-active-heat`, `is-active-cool`, `is-idle-heat`, `is-idle-cool`.
+- [x] 8.3 In `dist/styles.js`, extend the `::before` common-declarations selector list to include the two new idle classes. The shared rules (`content`, `position`, `inset`, `pointer-events`, `border-radius`) apply to all four.
+- [x] 8.4 Move the `animation: darklight-pulse ...` declaration off the common rule and into the two `is-active-*` rules only, so the idle classes don't animate.
+- [x] 8.5 Add `.dial--light.is-idle-heat::before` and `.dial--light.is-idle-cool::before` rules with reduced-alpha radial gradients (warm `rgba(255, 140, 0, 0.10)` → `0.04` → transparent, cool `rgba(0, 122, 241, 0.10)` → `0.04` → transparent).
+- [x] 8.6 Confirm the `prefers-reduced-motion` media query still targets only the active rules (idle tint is already static, not affected).
+- [x] 8.7 Sanity: `node --check` passes on the three `dist/*.js` files; CSS brace balance holds.
+- [x] 8.8 Bump version strings in `dist/main.js` from `0.1.2` to `0.1.3`.
+- [x] 8.9 Add a v0.1.3 changelog entry to `README.md`.
+- [x] 8.10 Commit on a fresh `agent/light-theme-polish-diff` worktree, merge `--no-ff` into master, tag `v0.1.3`, push master + tag, create the GitHub release with the three `dist/*.js` assets.
 
 ### 8.11 Manual verification on live HA (retest + extend)
 
