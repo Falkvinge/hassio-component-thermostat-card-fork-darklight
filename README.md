@@ -65,6 +65,17 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.3 — 2026-04-23
+
+Refinement of v0.1.2's active-state pulse, based on real-world observation that climate integrations often under-report activity (some report `hvac_action: idle` while the unit is audibly running; others never expose `hvac_action` at all).
+
+- **New (light theme):** The overlay now has two tiers.
+  - **Animated pulse** when `hvac_action` reports `heating` or `cooling` — confirmed active pumping. Same timing and colors as v0.1.2.
+  - **Static dim tint** when the mode is `heat`/`cool` but `hvac_action` isn't confirming activity (including when the attribute is missing entirely). Roughly half the gradient alpha of the active pulse; no animation. Answers "which ACs are switched on?" at a glance on an overview dashboard, even when the integration's action reporting is unreliable.
+- **Changed:** `deriveActiveMode` return shape widened from `'heat' | 'cool' | null` to `'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null`. The view toggles one of four mutually-exclusive classes (`is-active-heat`, `is-active-cool`, `is-idle-heat`, `is-idle-cool`) on the container.
+- **Changed:** Entities that don't expose `hvac_action` no longer land in the active-pulse bucket (they used to pulse on state alone, which over-claimed). They now land in the idle-tint bucket — honest about what we actually know.
+- **Unchanged:** Dark variant, public API, dashboard YAML, `prefers-reduced-motion` behavior (still disables the pulse animation; idle tints were already static).
+
 ### v0.1.2 — 2026-04-23
 
 - **Changed (light theme):** The off-state dial fill is now near-white (`#f7f7f7`) instead of the previous mid-grey, so an idle thermostat blends into a light dashboard instead of reading as a dark disc.

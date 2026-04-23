@@ -1,6 +1,6 @@
-import {cssData} from './styles.js?v=0.1.2';
-import ThermostatUI from './thermostat_card.lib.js?v=0.1.2';
-console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.2 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
+import {cssData} from './styles.js?v=0.1.3';
+import ThermostatUI from './thermostat_card.lib.js?v=0.1.3';
+console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.3 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 
 // Register with Home Assistant's card picker so this fork is identifiable
 // at card-configuration time. Without this, the "Add card" dialog would
@@ -165,22 +165,27 @@ class ThermostatCard extends HTMLElement {
 }
 customElements.define('thermostat-card', ThermostatCard);
 
-// Derive a simple active-mode signal from the climate entity:
-// 'heat' | 'cool' | null. Prefer the hvac_action attribute (answers
-// "is this climate actively pumping right now?"); fall back to the
-// selected mode (hvac_state) when the entity doesn't report action.
-// In auto/heat_cool without an action signal the direction is
-// ambiguous, so return null rather than guess.
+// Derive a differentiated activity signal from the climate entity:
+// 'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null.
+//
+//   active_*  = hvac_action confirms the unit is pumping right now.
+//               Drives the animated pulse overlay in CSS.
+//   idle_*    = the mode is heat/cool but hvac_action is not
+//               confirming active pumping (it's idle, off, missing,
+//               or the attribute isn't exposed by this integration).
+//               Drives a static dim tint overlay. Real-world AC
+//               integrations regularly report hvac_action: idle while
+//               the compressor is audibly running, so the idle tint
+//               still answers "which AC is on?" on an overview.
+//   null      = mode is off/auto/heat_cool/dry/fan_only/unknown, or
+//               direction is otherwise ambiguous. No overlay.
 function deriveActiveMode(entity) {
   const action = entity && entity.attributes && entity.attributes.hvac_action;
-  if (action === 'heating') return 'heat';
-  if (action === 'cooling') return 'cool';
-  if (action === 'idle' || action === 'off' || action === 'fan' || action === 'drying') return null;
-  // Fallback: entity doesn't expose hvac_action. Use the selected mode
-  // as a best-effort signal for heat/cool; everything else is null.
+  if (action === 'heating') return 'active_heat';
+  if (action === 'cooling') return 'active_cool';
   const state = entity && entity.state;
-  if (state === 'heat') return 'heat';
-  if (state === 'cool') return 'cool';
+  if (state === 'heat') return 'idle_heat';
+  if (state === 'cool') return 'idle_cool';
   return null;
 }
 
