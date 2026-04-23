@@ -65,6 +65,16 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.12 — 2026-04-23
+
+Third layered activity signal: a colored ring around the small HVAC-mode icon at the bottom of the card. Works in both theme variants.
+
+- **Added:** Idle states (`is-idle-cool` / `is-idle-heat`) render a solid full-circle colored ring around the mode icon (snowflake / flame / etc) at `.climate_info::before`. Static, ~4px stroke, in the cool-blue / warm-orange palette.
+- **Added:** Active states (`is-active-cool` / `is-active-heat`) render a half-arc (top + right CSS border sides = 180° of the circle) in the same mode color, rotating clockwise at ~1.2s per revolution — please-wait-spinner pace. The spinning arc is the cue that differentiates "actively pumping" from "armed but idle".
+- **Icon glyph stays upright:** The ring is on `::before` rather than a real border on `.climate_info`, so the rotation only spins the ring; the snowflake / flame stays visually upright.
+- **Reduced-motion fallback:** Under `prefers-reduced-motion: reduce`, the active-state ring falls back to a static full circle (not a static half-arc), preserving the state signal without motion.
+- **Three-layer signal vocabulary now complete:** card-wide radial overlay gradient (breathing for active, static tint for idle) + center-digit glow (static, always visible) + mode-icon ring (spinning for active, static for idle). All three use the same cool-blue / warm-orange palette and the same `is-active-*` / `is-idle-*` state classes, so they read as a coherent visual system.
+
 ### v0.1.11 — 2026-04-23
 
 Extend the v0.1.10 digit glow into the light variant for theme parity. After v0.1.10 QA confirmed the dark-mode glow reads clearly at a glance, light mode gets the same treatment — ready to verify at the next sunrise when the dashboard flips to Google Light Theme.

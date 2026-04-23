@@ -79,3 +79,27 @@ Initially shipped (v0.1.10) dark-variant-only. After dark-mode QA confirmed the 
 - [ ] 7.21 Manual QA (post-sunrise): light dashboard, idle cool / active heat / idle heat — confirm parity with dark variant's behavior
 - [ ] 7.22 Manual QA (post-sunrise): light dashboard, thermostat off — confirm NO glow
 - [ ] 7.23 Tune-if-needed: if light-variant glow reads as muddy / overbearing / insufficient, split the combined selectors in `dist/styles.js` and adjust light values independently
+
+## 8. Mode indicator ring on the HVAC icon
+
+Third layered signal (after overlay gradient and digit glow): add a colored ring around the small bottom-center HVAC-mode icon (`.climate_info`). Solid static ring for idle states, spinning half-arc for active states. Same colors/classes as the other two signals; works in both theme variants.
+
+- [x] 8.1 Add `.is-idle-cool .climate_info::before` + `.is-idle-heat .climate_info::before` shared base rule (content, position, inset −6px, border-radius 50%, 4px transparent border, box-sizing, pointer-events)
+- [x] 8.2 Add `.is-active-cool .climate_info::before` + `.is-active-heat .climate_info::before` into the same shared base rule
+- [x] 8.3 Idle cool: `border-color: rgba(0, 122, 241, 0.9)`
+- [x] 8.4 Idle heat: `border-color: rgba(255, 140, 0, 0.9)`
+- [x] 8.5 Active cool: `border-top-color` + `border-right-color` to `rgba(0, 122, 241, 0.95)`, animation `climate-spinner 1.2s linear infinite`
+- [x] 8.6 Active heat: same structure with `rgba(255, 140, 0, 0.95)`
+- [x] 8.7 Add `@keyframes climate-spinner { to { transform: rotate(360deg); } }`
+- [x] 8.8 Add `@media (prefers-reduced-motion: reduce)` override: active ring gets full-circle `border-color`, `animation: none`
+- [x] 8.9 Confirm no `.dial` / `.dial--dark` / `.dial--light` scoping is needed (the `is-*` classes alone are sufficient; ring is theme-variant-agnostic)
+- [x] 8.10 Bump `dist/main.js` banner + cache-busters from `0.1.11` to `0.1.12`; update `README.md` changelog
+- [x] 8.11 Run `openspec validate dark-theme-activity-overlay --strict` — valid
+- [ ] 8.12 Manual QA: dark dashboard, thermostat `cool` + `hvac_action: cooling` — confirm a blue half-arc rotates clockwise around the snowflake icon at spinner pace
+- [ ] 8.13 Manual QA: dark dashboard, thermostat `cool` + `hvac_action: idle` — confirm a solid full-circle blue ring around the snowflake, NOT rotating
+- [ ] 8.14 Manual QA: dark dashboard, thermostat `heat` + `hvac_action: heating` — confirm a warm-orange half-arc rotates clockwise around the flame icon
+- [ ] 8.15 Manual QA: dark dashboard, thermostat `heat` + `hvac_action: idle` — confirm a solid full-circle warm-orange ring around the flame
+- [ ] 8.16 Manual QA: dark dashboard, thermostat `off` — confirm NO ring around the power icon
+- [ ] 8.17 Manual QA: during active spin, confirm the snowflake/flame glyph itself does NOT rotate (only the ring)
+- [ ] 8.18 Manual QA: OS "Reduce motion" enabled, active state — confirm the ring is a full static circle (not a half-arc) and does NOT rotate
+- [ ] 8.19 Manual QA (post-sunrise): repeat 8.12–8.18 on light dashboard to confirm parity

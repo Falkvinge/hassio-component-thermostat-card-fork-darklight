@@ -368,6 +368,69 @@ export function cssData(user) {
   .dial--light.is-idle-heat .dial__lbl--high {
     filter: drop-shadow(0 0 6px rgba(255, 140, 0, 0.55));
   }
+
+  /* Mode indicator ring around the center-bottom HVAC mode icon
+     (the small snowflake/flame/etc at top:82% of the card).
+
+     Idle states render a solid full-circle ring in the mode color.
+     Active states render a half-arc (top + right borders, 180° of
+     the circle) spinning at please-wait-spinner pace, where the
+     rotation is the cue for "confirmed pumping" vs idle's "armed
+     but not pumping". Colors match the overlay / digit-glow palette
+     (cool-blue / warm-orange) so the whole dark/light activity
+     vocabulary is consistent: overlay gradient, digit glow, and
+     now this ring all reinforce the same state.
+
+     The ring is attached as a ::before on .climate_info rather than
+     as a border on the element itself, so the rotation animation
+     can rotate the ring without spinning the icon content. */
+  .is-idle-cool .climate_info::before,
+  .is-idle-heat .climate_info::before,
+  .is-active-cool .climate_info::before,
+  .is-active-heat .climate_info::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    pointer-events: none;
+    box-sizing: border-box;
+  }
+  /* Idle: full solid ring, static */
+  .is-idle-cool .climate_info::before {
+    border-color: rgba(0, 122, 241, 0.9);
+  }
+  .is-idle-heat .climate_info::before {
+    border-color: rgba(255, 140, 0, 0.9);
+  }
+  /* Active: half-arc (top+right = 180°), spinning clockwise */
+  .is-active-cool .climate_info::before {
+    border-top-color: rgba(0, 122, 241, 0.95);
+    border-right-color: rgba(0, 122, 241, 0.95);
+    animation: climate-spinner 1.2s linear infinite;
+  }
+  .is-active-heat .climate_info::before {
+    border-top-color: rgba(255, 140, 0, 0.95);
+    border-right-color: rgba(255, 140, 0, 0.95);
+    animation: climate-spinner 1.2s linear infinite;
+  }
+  @keyframes climate-spinner {
+    to { transform: rotate(360deg); }
+  }
+  /* Reduced-motion fallback: static full ring instead of spinning
+     half-arc. The signal (mode color + ring presence) is preserved;
+     only the motion is removed. */
+  @media (prefers-reduced-motion: reduce) {
+    .is-active-cool .climate_info::before {
+      border-color: rgba(0, 122, 241, 0.9);
+      animation: none;
+    }
+    .is-active-heat .climate_info::before {
+      border-color: rgba(255, 140, 0, 0.9);
+      animation: none;
+    }
+  }
+
   /* HVAC accent colors tuned for contrast on light backgrounds. Each
      mode keeps its identity from the dark variant; saturation and
      lightness are adjusted so ticks and mode icons stay legible. */
