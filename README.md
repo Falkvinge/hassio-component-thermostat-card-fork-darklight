@@ -65,6 +65,11 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.1 — 2026-04-23
+
+- **New:** Card self-registers with Home Assistant's `window.customCards` registry. The HA "Add card" dialog now lists this card as "Thermostat Card (darklight fork)" with a description and a direct link to this repo. Fork identity is now visible at dashboard-configuration time, not just in the devtools console.
+- **Unchanged:** Runtime rendering, feature set, public API. Dashboard YAML written against v0.1.0 continues to work.
+
 ### v0.1.0 — 2026-04-23
 
 Initial release under the `Falkvinge/hassio-component-thermostat-card-fork-darklight` name. Based on upstream `fineemb/lovelace-thermostat-card` v1.3.0.

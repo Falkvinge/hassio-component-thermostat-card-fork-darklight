@@ -1,6 +1,19 @@
-import {cssData} from './styles.js?v=0.1.0';
-import ThermostatUI from './thermostat_card.lib.js?v=0.1.0';
-console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.0 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
+import {cssData} from './styles.js?v=0.1.1';
+import ThermostatUI from './thermostat_card.lib.js?v=0.1.1';
+console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.1 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
+
+// Register with Home Assistant's card picker so this fork is identifiable
+// at card-configuration time. Without this, the "Add card" dialog would
+// show only the raw custom:thermostat-card type with no pretty name or
+// documentation link.
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: 'thermostat-card',
+  name: 'Thermostat Card (darklight fork)',
+  description: 'Circular thermostat card with automatic dark/light theme switching.',
+  preview: false,
+  documentationURL: 'https://github.com/Falkvinge/hassio-component-thermostat-card-fork-darklight',
+});
 class ThermostatCard extends HTMLElement {
   constructor() {
     super();
