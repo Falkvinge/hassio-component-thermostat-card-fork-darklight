@@ -94,9 +94,10 @@ export default class ThermostatUI {
     this.hvac_modes = options.hvac_modes;
     // options.theme_dark may be undefined on very first render; default to dark.
     this.theme_dark = options.theme_dark === undefined ? true : !!options.theme_dark;
-    // active_mode: 'heat' | 'cool' | null — derived upstream from
-    // hvac_action (primary) with hvac_state fallback. Drives the
-    // light-variant active-state pulse in CSS.
+    // active_mode: 'active_heat' | 'active_cool' | 'idle_heat' | 'idle_cool' | null.
+    // Derived upstream from hvac_action (primary) and hvac_state
+    // (fallback/idle). active_* drives the light-variant animated pulse;
+    // idle_* drives a static dim tint — see styles.js "activity overlay".
     this.active_mode = options.active_mode || null;
     this.temperature = {
       low: options.target_temperature_low,
@@ -111,10 +112,13 @@ export default class ThermostatUI {
     // inside the container) can respond via descendant selectors in CSS.
     this._container.classList.toggle('dial--dark', this.theme_dark);
     this._container.classList.toggle('dial--light', !this.theme_dark);
-    // Active-state classes drive the light-variant pulse overlay.
-    // At most one is set at a time; both are cleared when idle.
-    this._container.classList.toggle('is-active-heat', this.active_mode === 'heat');
-    this._container.classList.toggle('is-active-cool', this.active_mode === 'cool');
+    // Four activity classes drive the light-variant overlay. At most
+    // one is set at a time (the five active_mode values are mutually
+    // exclusive). is-active-* animate; is-idle-* are static dim tints.
+    this._container.classList.toggle('is-active-heat', this.active_mode === 'active_heat');
+    this._container.classList.toggle('is-active-cool', this.active_mode === 'active_cool');
+    this._container.classList.toggle('is-idle-heat',   this.active_mode === 'idle_heat');
+    this._container.classList.toggle('is-idle-cool',   this.active_mode === 'idle_cool');
     let tick_label, from, to;
     const tick_indexes = [];
     const ambient_index = SvgUtil.restrictToRange(Math.round((this.ambient - this.min_value) / (this.max_value - this.min_value) * config.num_ticks), 0, config.num_ticks - 1);

@@ -186,24 +186,31 @@ export function cssData(user) {
     --thermostat-text-color: #333333;
   }
 
-  /* Active-state pulse overlay, light variant only. A soft radial
-     gradient centered on the container, breathing slowly so users
-     scanning a dashboard can spot which climate entities are
-     actually heating/cooling right now. Detection signal comes
-     from active_mode (hvac_action primary, hvac_state fallback)
-     which main.js derives per update. */
+  /* Differentiated activity overlay, light variant only.
+     Two visual intensities on a single ::before pseudo-element:
+       is-active-*  = hvac_action confirms pumping -> animated pulse,
+                      full-alpha gradient.
+       is-idle-*    = mode is heat/cool but action isn't active (or
+                      isn't exposed) -> static dim tint, reduced alpha,
+                      no animation.
+     At most one of the four classes is set at a time (main.js
+     derives a single mutually-exclusive active_mode value). Colors
+     match --heat_color / --cool_color so the overlay reinforces the
+     existing mode palette rather than introducing a new vocabulary. */
   .dial--light {
     position: relative;
   }
   .dial--light.is-active-heat::before,
-  .dial--light.is-active-cool::before {
+  .dial--light.is-active-cool::before,
+  .dial--light.is-idle-heat::before,
+  .dial--light.is-idle-cool::before {
     content: '';
     position: absolute;
     inset: 0;
     pointer-events: none;
     border-radius: inherit;
-    animation: darklight-pulse 3s ease-in-out infinite;
   }
+  /* Active (confirmed pumping): full-alpha gradient, animated. */
   .dial--light.is-active-heat::before {
     background: radial-gradient(
       circle at center,
@@ -211,6 +218,7 @@ export function cssData(user) {
       rgba(255, 140, 0, 0.08) 45%,
       transparent 80%
     );
+    animation: darklight-pulse 3s ease-in-out infinite;
   }
   .dial--light.is-active-cool::before {
     background: radial-gradient(
@@ -219,12 +227,32 @@ export function cssData(user) {
       rgba(0, 122, 241, 0.08) 45%,
       transparent 80%
     );
+    animation: darklight-pulse 3s ease-in-out infinite;
+  }
+  /* Idle (mode armed but not pumping): ~half-alpha gradient, static. */
+  .dial--light.is-idle-heat::before {
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 140, 0, 0.10) 0%,
+      rgba(255, 140, 0, 0.04) 45%,
+      transparent 80%
+    );
+  }
+  .dial--light.is-idle-cool::before {
+    background: radial-gradient(
+      circle at center,
+      rgba(0, 122, 241, 0.10) 0%,
+      rgba(0, 122, 241, 0.04) 45%,
+      transparent 80%
+    );
   }
   @keyframes darklight-pulse {
     0%, 100% { opacity: 0.40; }
     50%      { opacity: 0.90; }
   }
   @media (prefers-reduced-motion: reduce) {
+    /* Only the active overlays animate; the idle tints are already
+       static and don't need overriding. */
     .dial--light.is-active-heat::before,
     .dial--light.is-active-cool::before {
       animation: none;
