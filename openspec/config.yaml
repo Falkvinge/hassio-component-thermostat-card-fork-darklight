@@ -1,0 +1,22 @@
+schema: spec-driven
+
+context: |
+  Domain: Home Assistant custom Lovelace dashboard card (thermostat control)
+  Tech stack: Vanilla JavaScript ES modules, SVG, CSS-in-JS
+  Runtime: Browser, loaded by Home Assistant frontend via HACS or manual install
+  No build system — dist/ files are the source (main.js, thermostat_card.lib.js, styles.js)
+  No package.json, no dependencies beyond HA's built-in web components (ha-card, ha-icon, ha-icon-button)
+  Custom element registered as <thermostat-card>, uses Shadow DOM
+  Interacts with HA via hass object (entity states, callService for climate.set_temperature and climate.set_hvac_mode)
+  Fork of fineemb/lovelace-thermostat-card v1.3.0, owned at Falkvinge/hassio-component-thermostat-card-fork-darklight
+  MIT licensed (Dal Hundal → Ciotlos & Baronda → fineemb → this fork)
+
+rules:
+  proposal:
+    - Keep proposals under 500 words
+    - Always include a "Non-goals" section
+  specs:
+    - Ground every requirement in actual current behavior, not aspirational
+    - Reference the specific source file and method where the behavior lives
+  tasks:
+    - Break tasks into chunks of max 2 hours
