@@ -1,6 +1,6 @@
-import {cssData} from './styles.js?v=0.1.8';
-import ThermostatUI from './thermostat_card.lib.js?v=0.1.8';
-console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.8 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
+import {cssData} from './styles.js?v=0.1.9';
+import ThermostatUI from './thermostat_card.lib.js?v=0.1.9';
+console.info("%c Thermostat Card (darklight fork) \n%c  Version  0.1.9 ", "color: orange; font-weight: bold; background: black", "color: white; font-weight: bold; background: dimgray");
 
 // Register with Home Assistant's card picker so this fork is identifiable
 // at card-configuration time. Without this, the "Add card" dialog would
@@ -190,25 +190,59 @@ function deriveActiveMode(entity) {
 }
 
 // Resolve HA theme mode to a boolean: true = dark, false = light.
-// hass.themes.selectedTheme is a ThemeSettings object { theme, dark?, ... },
-// not a string; the theme *name* lives at selectedTheme.theme.
 //
-// Priority:
-//   1. Named-theme overrides. "Google Dark Theme" / "Google Light Theme" are
-//      authoritative: the name specifies the intended appearance and HA's
-//      dark/light toggle can be set incoherently for these (e.g. a user can
-//      apply "Google Dark Theme" while the toggle still says light mode).
-//   2. selectedTheme.dark — HA's per-theme runtime flag, when present.
+// The theme currently in effect can live in any of three places on `hass`:
+//
+//   a. hass.selectedTheme / hass.themes.selectedTheme — a ThemeSettings
+//      object { theme, dark?, ... } set when a user/dashboard explicitly
+//      picks a theme (non-default). Its `.theme` field is the name string.
+//      When the dashboard inherits the default, this is null/undefined or
+//      has `.theme === "default"`.
+//   b. hass.themes.default_dark_theme — HA's global "use this name when
+//      darkMode is on" setting. Applies when the dashboard inherits the
+//      default AND darkMode is true.
+//   c. hass.themes.default_theme — HA's global default theme name. Applies
+//      when the dashboard inherits the default (and b doesn't apply).
+//
+// In this deployment HA switches between Google Light Theme and Google Dark
+// Theme at sunset/sunrise by changing `default_theme` directly, so (c) is
+// the most common source of the authoritative name.
+//
+// Resolution priority:
+//   1. Effective theme NAME (resolved across a/b/c) matches "Google Dark
+//      Theme" or "Google Light Theme". These are authoritative: the name
+//      specifies a fixed intended appearance and HA's dark/light toggle
+//      for them can be set incoherently and must be ignored.
+//   2. selectedTheme.dark — HA's per-theme runtime flag on the user
+//      override (only when the user has explicitly picked a non-default
+//      theme that exposes a .dark preference).
 //   3. hass.themes.darkMode — the global dashboard toggle.
 //   4. Default to dark for missing data (backward-compatible).
 function resolveThemeDark(hass) {
   if (!hass || !hass.themes) return true;
-  const sel = hass.themes.selectedTheme;
-  const name = sel && sel.theme;
+  const themes = hass.themes;
+  const sel = hass.selectedTheme || themes.selectedTheme;
+
+  // Resolve the effective theme name across the three sources.
+  let name = sel && sel.theme;
+  if (!name || name === 'default') {
+    if (themes.darkMode && themes.default_dark_theme) {
+      name = themes.default_dark_theme;
+    } else {
+      name = themes.default_theme;
+    }
+  }
+
+  // Named-theme overrides (authoritative regardless of darkMode/.dark flags).
   if (name === 'Google Dark Theme') return true;
   if (name === 'Google Light Theme') return false;
+
+  // Per-theme dark flag from the user override, when a non-Google theme is
+  // explicitly selected with its own dark preference.
   if (sel && typeof sel.dark === 'boolean') return sel.dark;
-  const darkMode = hass.themes.darkMode;
+
+  // Global toggle fallback.
+  const darkMode = themes.darkMode;
   return darkMode === undefined ? true : !!darkMode;
 }
 

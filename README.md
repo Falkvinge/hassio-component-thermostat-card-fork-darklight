@@ -65,6 +65,19 @@ The custom element name `thermostat-card` is unchanged from upstream — any exi
 
 ## Changelog
 
+### v0.1.9 — 2026-04-23
+
+Resolve the effective theme name across all three HA sources, so named-theme overrides work when HA switches the **default theme** at sunset/sunrise (the common deployment pattern).
+
+- **Fixed:** The named-theme override in v0.1.8 only checked `selectedTheme.theme`, which is null/undefined/`"default"` when the dashboard inherits the HA default. This deployment switches between Google Light Theme and Google Dark Theme by flipping `hass.themes.default_theme` at sun events, so the override never saw the real name.
+- **Added:** `resolveThemeDark()` now resolves the effective theme name across three sources in order:
+  1. `selectedTheme.theme` if set and not `"default"` (explicit per-user/dashboard pick)
+  2. `hass.themes.default_dark_theme` if `darkMode` is on and it's set (HA's "use this when dark")
+  3. `hass.themes.default_theme` (HA's global default)
+
+  The resulting effective name is then checked against `"Google Dark Theme"` / `"Google Light Theme"` overrides before falling through to `selectedTheme.dark` and `darkMode`.
+- **Also:** Reads `selectedTheme` from either `hass.selectedTheme` or `hass.themes.selectedTheme` for robustness across HA frontend versions.
+
 ### v0.1.8 — 2026-04-23
 
 Correctly restored named-theme overrides in the theme-mode detection (the fix in v0.1.7 was partially wrong — it dropped the named-theme priority that the original design intended).
