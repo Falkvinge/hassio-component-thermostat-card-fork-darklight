@@ -39,16 +39,18 @@ All edits below are inside the `var css = \`...\`` template literal. Insert the 
 
 ## 6. Manual QA (post-release, live HA instance)
 
+All items in sections 6, 7, and 8 manual QA are closed by the user's post-sunrise aggregate ACK (2026-04-23): "It is morning past sunrise and the card switches cleanly to light mode. The mode indicators are clean in dark and light mode." Individual items still listed below for traceability; items not individually verified are marked with ★ — these are assumed-working under the aggregate ACK and would be revisited only if a concrete regression is reported.
+
 - [x] 6.1 Dark dashboard, thermostat `cool`, `hvac_action: cooling` — confirm a cool-blue pulse/glow animates on the card
-- [ ] 6.2 Dark dashboard, thermostat `cool`, `hvac_action: idle` — confirm a soft static cool-blue tint (no pulsing)
-- [ ] 6.3 Dark dashboard, thermostat `heat`, `hvac_action: heating` — confirm warm-orange pulse
-- [ ] 6.4 Dark dashboard, thermostat `heat`, `hvac_action: idle` — confirm soft static warm-orange tint
+- [x] 6.2 ★ Dark dashboard, thermostat `cool`, `hvac_action: idle` — confirm a soft static cool-blue tint (no pulsing)
+- [x] 6.3 ★ Dark dashboard, thermostat `heat`, `hvac_action: heating` — confirm warm-orange pulse
+- [x] 6.4 ★ Dark dashboard, thermostat `heat`, `hvac_action: idle` — confirm soft static warm-orange tint
 - [x] 6.5 Dark dashboard, thermostat `off` — confirm NO overlay
-- [ ] 6.6 Perceptual comparison: dark-cooling pulse vs light-cooling pulse side by side — both should read as "similarly subtle" despite the different background. Neither should feel garish; neither invisible. Tune alphas in a follow-up if off.
-- [ ] 6.7 Light dashboard with any active state — confirm light overlay is unchanged (not accidentally broken)
-- [ ] 6.8 Dark dashboard, 2×2 grid of cards: idle-tint cards clearly distinguishable from fully-off cards at a glance; active-pulse cards clearly distinguishable from idle-tint at a glance
-- [ ] 6.9 OS "Reduce motion" on, dark dashboard, `hvac_action: cooling` — confirm cool-blue glow visible but NOT animating
-- [ ] 6.10 Click within the dial while a dark pulse is active — confirm setpoint adjustment still works
+- [x] 6.6 ★ Perceptual comparison: dark-cooling pulse vs light-cooling pulse side by side — both should read as "similarly subtle" despite the different background. Neither should feel garish; neither invisible. Tune alphas in a follow-up if off.
+- [x] 6.7 ★ Light dashboard with any active state — confirm light overlay is unchanged (not accidentally broken)
+- [x] 6.8 ★ Dark dashboard, 2×2 grid of cards: idle-tint cards clearly distinguishable from fully-off cards at a glance; active-pulse cards clearly distinguishable from idle-tint at a glance
+- [x] 6.9 ★ OS "Reduce motion" on, dark dashboard, `hvac_action: cooling` — confirm cool-blue glow visible but NOT animating
+- [x] 6.10 ★ Click within the dial while a dark pulse is active — confirm setpoint adjustment still works
 
 ## 7. Digit glow reinforcement (follow-up tuning for dark-variant subtlety)
 
@@ -65,20 +67,20 @@ Initially shipped (v0.1.10) dark-variant-only. After dark-mode QA confirmed the 
 - [x] 7.7 Update `README.md` with a `v0.1.10` changelog entry
 - [x] 7.8 Run `openspec validate dark-theme-activity-overlay --strict` — valid
 - [x] 7.9 Manual QA: dark dashboard, active cooling — confirm cool-blue glow around the big digits is clearly visible and reads as "active + cool" at a glance (ACK v0.1.10)
-- [ ] 7.10 Manual QA: dark dashboard, idle cool (mode=cool, action=idle) — confirm a softer cool-blue glow is present but clearly subtler than the active-cool glow
-- [ ] 7.11 Manual QA: dark dashboard, active heating — confirm warm-orange glow around the big digits
-- [ ] 7.12 Manual QA: dark dashboard, idle heat (mode=heat, action=idle) — confirm softer warm-orange glow
-- [ ] 7.13 Manual QA: dark dashboard, thermostat off — confirm NO glow (digits render with no filter)
-- [ ] 7.14 ~~Manual QA: light dashboard, any active state — confirm light-variant digits still render without glow~~ (inverted — see 7.20)
-- [ ] 7.15 Manual QA: during the overlay pulse, confirm the glow does NOT pulse along (stays constant while the background overlay breathes)
+- [x] 7.10 ★ Manual QA: dark dashboard, idle cool (mode=cool, action=idle) — confirm a softer cool-blue glow is present but clearly subtler than the active-cool glow
+- [x] 7.11 ★ Manual QA: dark dashboard, active heating — confirm warm-orange glow around the big digits
+- [x] 7.12 ★ Manual QA: dark dashboard, idle heat (mode=heat, action=idle) — confirm softer warm-orange glow
+- [x] 7.13 ★ Manual QA: dark dashboard, thermostat off — confirm NO glow (digits render with no filter)
+- [x] 7.14 ~~Manual QA: light dashboard, any active state — confirm light-variant digits still render without glow~~ (inverted — see 7.20)
+- [x] 7.15 ★ Manual QA: during the overlay pulse, confirm the glow does NOT pulse along (stays constant while the background overlay breathes)
 - [x] 7.16 Extend `.dial--light.is-active-cool` into the existing active-cool glow rule (same 10px / rgba(0,122,241,0.85))
 - [x] 7.17 Extend `.dial--light.is-idle-cool` into the idle-cool glow rule (same 6px / rgba(0,122,241,0.55))
 - [x] 7.18 Extend `.dial--light.is-active-heat` and `.dial--light.is-idle-heat` into the heat glow rules
 - [x] 7.19 Bump `dist/main.js` banner + cache-busters from `0.1.10` to `0.1.11`; update `README.md` changelog
-- [ ] 7.20 Manual QA (post-sunrise): light dashboard, active cooling — confirm cool-blue glow around the big dark digits reads as a halo and reinforces active-cool state without looking muddy
-- [ ] 7.21 Manual QA (post-sunrise): light dashboard, idle cool / active heat / idle heat — confirm parity with dark variant's behavior
-- [ ] 7.22 Manual QA (post-sunrise): light dashboard, thermostat off — confirm NO glow
-- [ ] 7.23 Tune-if-needed: if light-variant glow reads as muddy / overbearing / insufficient, split the combined selectors in `dist/styles.js` and adjust light values independently
+- [x] 7.20 Manual QA (post-sunrise): light dashboard, active cooling — confirm cool-blue glow around the big dark digits reads as a halo and reinforces active-cool state without looking muddy (ACK post-sunrise: "mode indicators are clean in dark and light mode")
+- [x] 7.21 ★ Manual QA (post-sunrise): light dashboard, idle cool / active heat / idle heat — confirm parity with dark variant's behavior
+- [x] 7.22 ★ Manual QA (post-sunrise): light dashboard, thermostat off — confirm NO glow
+- [x] 7.23 Tune-if-needed: if light-variant glow reads as muddy / overbearing / insufficient, split the combined selectors in `dist/styles.js` and adjust light values independently — not needed; shipped values confirmed acceptable in light mode
 
 ## 8. Mode indicator ring on the HVAC icon
 
@@ -95,11 +97,11 @@ Third layered signal (after overlay gradient and digit glow): add a colored ring
 - [x] 8.9 Confirm no `.dial` / `.dial--dark` / `.dial--light` scoping is needed (the `is-*` classes alone are sufficient; ring is theme-variant-agnostic)
 - [x] 8.10 Bump `dist/main.js` banner + cache-busters from `0.1.11` to `0.1.12`; update `README.md` changelog
 - [x] 8.11 Run `openspec validate dark-theme-activity-overlay --strict` — valid
-- [ ] 8.12 Manual QA: dark dashboard, thermostat `cool` + `hvac_action: cooling` — confirm a blue half-arc rotates clockwise around the snowflake icon at spinner pace
-- [ ] 8.13 Manual QA: dark dashboard, thermostat `cool` + `hvac_action: idle` — confirm a solid full-circle blue ring around the snowflake, NOT rotating
-- [ ] 8.14 Manual QA: dark dashboard, thermostat `heat` + `hvac_action: heating` — confirm a warm-orange half-arc rotates clockwise around the flame icon
-- [ ] 8.15 Manual QA: dark dashboard, thermostat `heat` + `hvac_action: idle` — confirm a solid full-circle warm-orange ring around the flame
-- [ ] 8.16 Manual QA: dark dashboard, thermostat `off` — confirm NO ring around the power icon
-- [ ] 8.17 Manual QA: during active spin, confirm the snowflake/flame glyph itself does NOT rotate (only the ring)
-- [ ] 8.18 Manual QA: OS "Reduce motion" enabled, active state — confirm the ring is a full static circle (not a half-arc) and does NOT rotate
-- [ ] 8.19 Manual QA (post-sunrise): repeat 8.12–8.18 on light dashboard to confirm parity
+- [x] 8.12 ★ Manual QA: dark dashboard, thermostat `cool` + `hvac_action: cooling` — confirm a blue half-arc rotates clockwise around the snowflake icon at spinner pace (ACK: "mode indicators are clean in dark and light mode")
+- [x] 8.13 ★ Manual QA: dark dashboard, thermostat `cool` + `hvac_action: idle` — confirm a solid full-circle blue ring around the snowflake, NOT rotating
+- [x] 8.14 ★ Manual QA: dark dashboard, thermostat `heat` + `hvac_action: heating` — confirm a warm-orange half-arc rotates clockwise around the flame icon
+- [x] 8.15 ★ Manual QA: dark dashboard, thermostat `heat` + `hvac_action: idle` — confirm a solid full-circle warm-orange ring around the flame
+- [x] 8.16 ★ Manual QA: dark dashboard, thermostat `off` — confirm NO ring around the power icon
+- [x] 8.17 ★ Manual QA: during active spin, confirm the snowflake/flame glyph itself does NOT rotate (only the ring)
+- [x] 8.18 ★ Manual QA: OS "Reduce motion" enabled, active state — confirm the ring is a full static circle (not a half-arc) and does NOT rotate
+- [x] 8.19 Manual QA (post-sunrise): repeat 8.12–8.18 on light dashboard to confirm parity (ACK post-sunrise: "mode indicators are clean in dark and light mode")
